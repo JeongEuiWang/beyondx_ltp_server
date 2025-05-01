@@ -9,7 +9,7 @@ from app.model._mixin import AutoIntegerIdMixin, TimestampMixin
 class Quote(TimestampMixin, Base):
     __tablename__ = "quote"
     id = Column(String(32), primary_key=True)
-    client_id = Column(Integer, ForeignKey("client.id"), nullable=False)
+    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
     cargo_transportation_id = Column(Integer, ForeignKey("cargo_transportation.id"), nullable=False)
     is_priority = Column(Boolean, nullable=False, default=False)
 
@@ -20,7 +20,7 @@ class Quote(TimestampMixin, Base):
     order_primary = Column(String(255), nullable=False)
     order_additional_request = Column(Text)
     
-    client = relationship("Client", back_populates="quote")
+    user = relationship("User", back_populates="quote")
     cargo_transportation = relationship("CargoTransportation", back_populates="quote")
     quote_location = relationship("QuoteLocation", back_populates="quote")
     quote_cargo = relationship("QuoteCargo", back_populates="quote")

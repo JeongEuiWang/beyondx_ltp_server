@@ -4,7 +4,7 @@ class RoleEnum(StrEnum):
     USER = "USER"
     ADMIN = "ADMIN"
 
-class ClientLevelEnum(StrEnum):
+class UserLevelEnum(StrEnum):
     DEFAULT = "DEFAULT"
     SILVER = "SILVER"
     GOLD = "GOLD"

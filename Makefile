@@ -42,6 +42,11 @@ reset-prod:
 .PHONY: ci
 ci: clean build package
 
+# Run tests
+.PHONY: test 
+test:
+	pytest -q
+
 .PHONY: help ## Prints help for targets with comments
 help: 
 	@cat $(MAKEFILE_LIST) | grep -E '^[a-zA-Z_-]+:.*?## .*$$' | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'

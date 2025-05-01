@@ -14,8 +14,7 @@ sys.path.append(str(pathlib.Path(__file__).resolve().parents[3]))
 
 # SQLAlchemy 모델 임포트
 from app.db.base import Base
-from app.model.user import User
-from app.model.client import Client, ClientAddress, ClientLevel
+from app.model.user import User, UserLevel, UserAddress, Role
 from app.model.cargo import CargoTransportation, CargoAccessorial, CargoPackage
 from app.model.rate import RateArea, RateRegion, RateLocation
 from app.model.quote import Quote, QuoteLocation, QuoteLocationAccessorial

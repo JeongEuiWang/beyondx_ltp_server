@@ -10,7 +10,7 @@ from typing import Sequence, Union
 from alembic import op
 import sqlalchemy as sa
 
-from app.model._enum import ClientLevelEnum, RoleEnum
+from app.model._enum import UserLevelEnum, RoleEnum
 
 
 # revision identifiers, used by Alembic.
@@ -33,21 +33,21 @@ def insert_role() -> None:
         ]
     )
 
-def insert_client_level() -> None:
-    client_level_table = sa.table(
-           'client_level',
+def insert_user_level() -> None:
+    user_level_table = sa.table(
+           'user_level',
            sa.column('id', sa.Integer),
-           sa.column('client_level', sa.Enum(ClientLevelEnum)),
+           sa.column('user_level', sa.Enum(UserLevelEnum)),
            sa.column('required_amount', sa.Numeric(16, 4)),
            sa.column('discount_rate', sa.Numeric(16, 4)),
        )
     op.bulk_insert(
-        client_level_table,
+        user_level_table,
         [
-            {"id": 1, "client_level": ClientLevelEnum.DEFAULT, "required_amount": 0, "discount_rate": 0},
-            {"id": 2, "client_level": ClientLevelEnum.SILVER, "required_amount": 1000000, "discount_rate": 0.1},
-            {"id": 3, "client_level": ClientLevelEnum.GOLD, "required_amount": 5000000, "discount_rate": 0.15},
-            {"id": 4, "client_level": ClientLevelEnum.VIP, "required_amount": 10000000, "discount_rate": 0.2},
+            {"id": 1, "user_level": UserLevelEnum.DEFAULT, "required_amount": 0, "discount_rate": 0},
+            {"id": 2, "user_level": UserLevelEnum.SILVER, "required_amount": 1000000, "discount_rate": 0.1},
+            {"id": 3, "user_level": UserLevelEnum.GOLD, "required_amount": 5000000, "discount_rate": 0.15},
+            {"id": 4, "user_level": UserLevelEnum.VIP, "required_amount": 10000000, "discount_rate": 0.2},
         ]
     )
 
@@ -109,7 +109,7 @@ def insert_cargo_package() -> None:
 def upgrade() -> None:
     """Upgrade schema."""
     insert_role()
-    insert_client_level()
+    insert_user_level()
     insert_cargo_transportation()
     insert_cargo_accessorial()
     insert_cargo_package()

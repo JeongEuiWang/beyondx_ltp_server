@@ -3,7 +3,7 @@
 75002,Allen,TX,Collin County,c
 75006,Carrollton,TX,Dallas County,b
 75007,Carrollton,TX,Denton County,b
-75009,Celina,TX,Collin County,
+75009,Celina,TX,Collin County,c
 75010,Carrollton,TX,Denton County,b
 75011,Carrollton,TX,Dallas County,b
 75013,Allen,TX,Collin County,c
@@ -12,8 +12,8 @@
 75016,Irving,TX,Dallas County,a
 75017,Irving,TX,Dallas County,a
 75019,Coppell,TX,Dallas County,a
-75020,Denison,TX,Grayson County,
-75021,Denison,TX,Grayson County,
+75020,Denison,TX,Grayson County,N/A
+75021,Denison,TX,Grayson County,N/A
 75022,Flower Mound,TX,Denton County,b
 75023,Plano,TX,Collin County,b
 75024,Plano,TX,Collin County,b
@@ -22,8 +22,8 @@
 75027,Flower Mound,TX,Denton County,b
 75028,Flower Mound,TX,Denton County,b
 75029,Lewisville,TX,Denton County,b
-75030,Rowlett,TX,Dallas County,
-75032,Rockwall,TX,Rockwall County,
+75030,Rowlett,TX,Dallas County,c
+75032,Rockwall,TX,Rockwall County,c
 75033,Frisco,TX,Denton County,c
 75034,Frisco,TX,Collin County,c
 75035,Frisco,TX,Collin County,c
@@ -39,16 +39,16 @@
 75045,Garland,TX,Dallas County,b
 75046,Garland,TX,Dallas County,b
 75047,Garland,TX,Dallas County,b
-75048,Sachse,TX,Dallas County,
+75048,Sachse,TX,Dallas County,c
 75049,Garland,TX,Dallas County,b
 75050,Grand Prairie,TX,Dallas County,a
-75051,Grand Prairie,TX,Dallas County,
+75051,Grand Prairie,TX,Dallas County,a
 75052,Grand Prairie,TX,Dallas County,b
-75053,Grand Prairie,TX,Dallas County,
+75053,Grand Prairie,TX,Dallas County,a
 75054,Grand Prairie,TX,Tarrant County,b
-75056,SUNNYDALE,TX,Denton County,
+75056,SUNNYDALE,TX,Denton County,c
 75057,Lewisville,TX,Denton County,b
-75058,Gunter,TX,Grayson County,
+75058,Gunter,TX,Grayson County,N/A
 75060,Irving,TX,Dallas County,a
 75061,Irving,TX,Dallas County,a
 75062,Irving,TX,Dallas County,a
@@ -62,70 +62,70 @@
 75072,Mckinney,TX,Collin County,c
 75074,Plano,TX,Collin County,b
 75075,Plano,TX,Collin County,b
-75076,Pottsboro,TX,Grayson County,
+75076,Pottsboro,TX,Grayson County,N/A
 75077,Lewisville,TX,Denton County,b
-75078,Prosper,TX,Collin County,
+75078,Prosper,TX,Collin County,c
 75080,Richardson,TX,Dallas County,b
 75081,Richardson,TX,Dallas County,b
 75082,Richardson,TX,Collin County,b
 75083,Richardson,TX,Dallas County,b
 75085,Richardson,TX,Dallas County,b
 75086,Plano,TX,Collin County,b
-75087,Rockwall,TX,Rockwall County,
-75088,Rowlett,TX,Dallas County,
-75089,Rowlett,TX,Dallas County,
-75090,Sherman,TX,Grayson County,
-75091,Sherman,TX,Grayson County,
-75092,Sherman,TX,Grayson County,
+75087,Rockwall,TX,Rockwall County,c
+75088,Rowlett,TX,Dallas County,c
+75089,Rowlett,TX,Dallas County,c
+75090,Sherman,TX,Grayson County,N/A
+75091,Sherman,TX,Grayson County,N/A
+75092,Sherman,TX,Grayson County,N/A
 75093,Plano,TX,Collin County,b
 75094,Plano,TX,Collin County,b
-75097,Weston,TX,Collin County,
+75097,Weston,TX,Collin County,N/A
 75098,Wylie,TX,Collin County,c
 75099,Coppell,TX,Dallas County,a
-75101,Bardwell,TX,Ellis County,
+75101,Bardwell,TX,Ellis County,N/A
 75104,Cedar Hill,TX,Dallas County,c
 75106,Cedar Hill,TX,Dallas County,c
-75114,Crandall,TX,Kaufman County,
+75114,Crandall,TX,Kaufman County,N/A
 75115,Desoto,TX,Dallas County,c
 75116,Duncanville,TX,Dallas County,b
-75118,Elmo,TX,Kaufman County,
-75119,Ennis,TX,Ellis County,
-75120,Ennis,TX,Ellis County,
-75121,Copeville,TX,Collin County,
+75118,Elmo,TX,Kaufman County,N/A
+75119,Ennis,TX,Ellis County,N/A
+75120,Ennis,TX,Ellis County,N/A
+75121,Copeville,TX,Collin County,N/A
 75123,Desoto,TX,Dallas County,c
-75125,Ferris,TX,Ellis County,
-75126,Forney,TX,Kaufman County,
-75132,Fate,TX,Rockwall County,
+75125,Ferris,TX,Ellis County,N/A
+75126,Forney,TX,Kaufman County,N/A
+75132,Fate,TX,Rockwall County,N/A
 75134,Lancaster,TX,Dallas County,c
-75135,Caddo Mills,TX,Hunt County,
+75135,Caddo Mills,TX,Hunt County,N/A
 75137,Duncanville,TX,Dallas County,b
 75138,Duncanville,TX,Dallas County,b
-75141,Hutchins,TX,Dallas County,
-75142,Kaufman,TX,Kaufman County,
+75141,Hutchins,TX,Dallas County,c
+75142,Kaufman,TX,Kaufman County,N/A
 75146,Lancaster,TX,Dallas County,c
-75147,Mabank,TX,Kaufman County,
+75147,Mabank,TX,Kaufman County,N/A
 75149,Mesquite,TX,Dallas County,c
 75150,Mesquite,TX,Dallas County,c
-75152,Palmer,TX,Ellis County,
-75154,Red Oak,TX,Ellis County,
-75157,Rosser,TX,Kaufman County,
-75158,Scurry,TX,Kaufman County,
-75159,Seagoville,TX,Dallas County,
-75160,Terrell,TX,Kaufman County,
-75161,Terrell,TX,Kaufman County,
-75164,Josephine,TX,Collin County,
-75165,Waxahachie,TX,Ellis County,
-75166,Lavon,TX,Collin County,
-75167,Waxahachie,TX,Ellis County,
-75168,Waxahachie,TX,Ellis County,
-75172,Wilmer,TX,Dallas County,
-75173,Nevada,TX,Collin County,
-75180,Balch Springs,TX,Dallas County,
+75152,Palmer,TX,Ellis County,N/A
+75154,Red Oak,TX,Ellis County,N/A
+75157,Rosser,TX,Kaufman County,N/A
+75158,Scurry,TX,Kaufman County,N/A
+75159,Seagoville,TX,Dallas County,c
+75160,Terrell,TX,Kaufman County,N/A
+75161,Terrell,TX,Kaufman County,N/A
+75164,Josephine,TX,Collin County,N/A
+75165,Waxahachie,TX,Ellis County,N/A
+75166,Lavon,TX,Collin County,N/A
+75167,Waxahachie,TX,Ellis County,c
+75168,Waxahachie,TX,Ellis County,c
+75172,Wilmer,TX,Dallas County,c
+75173,Nevada,TX,Collin County,c
+75180,Balch Springs,TX,Dallas County,c
 75181,Mesquite,TX,Dallas County,c
 75182,Sunnyvale,TX,Dallas County,c
 75185,Mesquite,TX,collin County,c
 75187,Mesquite,TX,Dallas County,c
-75189,Royse City,TX,Rockwall County,
+75189,Royse City,TX,Rockwall County,N/A
 75201,Dallas,TX,Dallas County,a
 75202,Dallas,TX,Dallas County,a
 75203,Dallas,TX,Dallas County,a
@@ -247,29 +247,29 @@
 75396,Dallas,TX,Dallas County,a
 75397,Dallas,TX,Dallas County,a
 75398,Dallas,TX,Dallas County,a
-75401,Greenville,TX,Hunt County,
-75402,Greenville,TX,Hunt County,
-75403,Greenville,TX,Hunt County,
-75404,Greenville,TX,Hunt County,
-75407,Princeton,TX,Collin County,
-75409,Anna,TX,Collin County,
-75414,Bells,TX,Grayson County,
-75422,Campbell,TX,Hunt County,
-75423,Celeste,TX,Hunt County,
-75424,Blue Ridge,TX,Collin County,
-75428,Commerce,TX,Hunt County,
-75429,Commerce,TX,Hunt County,
-75442,Farmersville,TX,Collin County,
-75453,Lone Oak,TX,Hunt County,
-75454,Melissa,TX,Collin County,
-75458,Merit,TX,Hunt County,
-75459,Howe,TX,Grayson County,
-75474,Quinlan,TX,Hunt County,
-75485,Westminster,TX,Collin County,
-75489,Tom Bean,TX,Grayson County,
-75491,Whitewright,TX,Grayson County,
-75495,Van Alstyne,TX,Grayson County,
-75496,Wolfe City,TX,Hunt County,
+75401,Greenville,TX,Hunt County,N/A
+75402,Greenville,TX,Hunt County,N/A
+75403,Greenville,TX,Hunt County,N/A
+75404,Greenville,TX,Hunt County,N/A
+75407,Princeton,TX,Collin County,N/A
+75409,Anna,TX,Collin County,N/A
+75414,Bells,TX,Grayson County,N/A
+75422,Campbell,TX,Hunt County,N/A
+75423,Celeste,TX,Hunt County,N/A
+75424,Blue Ridge,TX,Collin County,N/A
+75428,Commerce,TX,Hunt County,N/A
+75429,Commerce,TX,Hunt County,N/A
+75442,Farmersville,TX,Collin County,N/A
+75453,Lone Oak,TX,Hunt County,N/A
+75454,Melissa,TX,Collin County,N/A
+75458,Merit,TX,Hunt County,N/A
+75459,Howe,TX,Grayson County,N/A
+75474,Quinlan,TX,Hunt County,N/A
+75485,Westminster,TX,Collin County,N/A
+75489,Tom Bean,TX,Grayson County,N/A
+75491,Whitewright,TX,Grayson County,N/A
+75495,Van Alstyne,TX,Grayson County,N/A
+75496,Wolfe City,TX,Hunt County,N/A
 76001,Arlington,TX,Tarrant County,b
 76002,Arlington,TX,Tarrant County,b
 76003,Arlington,TX,Tarrant County,b
@@ -277,8 +277,8 @@
 76005,Arlington,TX,Tarrant County,b
 76006,Arlington,TX,Tarrant County,b
 76007,Arlington,TX,Tarrant County,b
-76008,Aledo,TX,Parker County,
-76009,Alvarado,TX,Johnson County,
+76008,Aledo,TX,Parker County,N/A
+76009,Alvarado,TX,Johnson County,N/A
 76010,Arlington,TX,Tarrant County,b
 76011,Arlington,TX,Tarrant County,b
 76012,Arlington,TX,Tarrant County,b
@@ -289,48 +289,48 @@
 76017,Arlington,TX,Tarrant County,b
 76018,Arlington,TX,Tarrant County,b
 76019,Arlington,TX,Tarrant County,b
-76020,Azle,TX,Tarrant County,
+76020,Azle,TX,Tarrant County,c
 76021,Bedford,TX,Tarrant County,a
 76022,Bedford,TX,Tarrant County,a
-76028,Burleson,TX,Johnson County,
-76031,Cleburne,TX,Johnson County,
-76033,Cleburne,TX,Johnson County,
+76028,Burleson,TX,Johnson County,N/A
+76031,Cleburne,TX,Johnson County,N/A
+76033,Cleburne,TX,Johnson County,N/A
 76034,Colleyville,TX,Tarrant County,a
-76035,Cresson,TX,Parker County,
-76036,Crowley,TX,Tarrant County,
+76035,Cresson,TX,Parker County,N/A
+76036,Crowley,TX,Tarrant County,N/A
 76039,Euless,TX,Tarrant County,a
 76040,Euless,TX,Tarrant County,a
-76041,Forreston,TX,Ellis County,
-76044,Godley,TX,Johnson County,
-76048,Granbury,TX,Hood County,
-76049,Granbury,TX,Hood County,
-76050,Grandview,TX,Johnson County,
+76041,Forreston,TX,Ellis County,N/A
+76044,Godley,TX,Johnson County,N/A
+76048,Granbury,TX,Hood County,N/A
+76049,Granbury,TX,Hood County,N/A
+76050,Grandview,TX,Johnson County,N/A
 76051,Grapevine,TX,Tarrant County,a
 76052,Haslet,TX,Tarrant County,c
 76053,Hurst,TX,Tarrant County,b
 76054,Hurst,TX,Tarrant County,a
-76058,Joshua,TX,Johnson County,
-76059,Keene,TX,Johnson County,
+76058,Joshua,TX,Johnson County,N/A
+76059,Keene,TX,Johnson County,N/A
 76060,Kennedale,TX,Tarrant County,c
-76061,Lillian,TX,Johnson County,
+76061,Lillian,TX,Johnson County,N/A
 76063,Mansfield,TX,Tarrant County,c
-76064,Maypearl,TX,Ellis County,
-76065,Midlothian,TX,Ellis County,
-76066,Millsap,TX,Parker County,
-76068,Mineral Wells,TX,Parker County,
-76082,Springtown,TX,Parker County,
-76084,Venus,TX,Johnson County,
-76085,Weatherford,TX,Parker County,
-76086,Weatherford,TX,Parker County,
-76087,Weatherford,TX,Parker County,
-76088,Weatherford,TX,Parker County,
+76064,Maypearl,TX,Ellis County,N/A
+76065,Midlothian,TX,Ellis County,N/A
+76066,Millsap,TX,Parker County,N/A
+76068,Mineral Wells,TX,Parker County,N/A
+76082,Springtown,TX,Parker County,N/A
+76084,Venus,TX,Johnson County,N/A
+76085,Weatherford,TX,Parker County,N/A
+76086,Weatherford,TX,Parker County,N/A
+76087,Weatherford,TX,Parker County,N/A
+76088,Weatherford,TX,Parker County,N/A
 76092,Southlake,TX,Tarrant County,a
-76093,Rio Vista,TX,Johnson County,
+76093,Rio Vista,TX,Johnson County,N/A
 76094,Arlington,TX,Tarrant County,b
 76095,Bedford,TX,Tarrant County,a
 76096,Arlington,TX,Tarrant County,b
-76097,Burleson,TX,Johnson County,
-76098,Azle,TX,Tarrant County,
+76097,Burleson,TX,Johnson County,N/A
+76098,Azle,TX,Tarrant County,c
 76099,Grapevine,TX,Tarrant County,a
 76101,Fort Worth,TX,Tarrant County,b
 76102,Fort Worth,TX,Tarrant County,b
@@ -357,7 +357,7 @@
 76123,Fort Worth,TX,Tarrant County,c
 76124,Fort Worth,TX,Tarrant County,b
 76126,Fort Worth,TX,Tarrant County,c
-76127,Naval Air Station Jrb,TX,Tarrant County,
+76127,Naval Air Station Jrb,TX,Tarrant County,c
 76129,Fort Worth,TX,Tarrant County,b
 76130,Fort Worth,TX,Tarrant County,b
 76131,Fort Worth,TX,Tarrant County,b
@@ -402,29 +402,29 @@
 76209,Denton,TX,Denton County,c
 76210,Denton,TX,Denton County,c
 76226,Argyle,TX,Denton County,c
-76227,Aubrey,TX,Denton County,
-76233,Collinsville,TX,Grayson County,
+76227,Aubrey,TX,Denton County,N/A
+76233,Collinsville,TX,Grayson County,N/A
 76244,Keller,TX,Tarrant County,b
-76245,Gordonville,TX,Grayson County,
+76245,Gordonville,TX,Grayson County,N/A
 76247,Justin,TX,Denton County,c
 76248,Keller,TX,Tarrant County,b
-76249,Krum,TX,Denton County,
-76258,Pilot Point,TX,Denton County,
-76259,Ponder,TX,Denton County,
+76249,Krum,TX,Denton County,c
+76258,Pilot Point,TX,Denton County,N/A
+76259,Ponder,TX,Denton County,N/A
 76262,Roanoke,TX,Denton County,b
-76264,Sadler,TX,Grayson County,
-76266,Sanger,TX,Denton County,
-76268,Southmayd,TX,Grayson County,
-76271,Tioga,TX,Grayson County,
-76273,Whitesboro,TX,Grayson County,
+76264,Sadler,TX,Grayson County,N/A
+76266,Sanger,TX,Denton County,N/A
+76268,Southmayd,TX,Grayson County,N/A
+76271,Tioga,TX,Grayson County,N/A
+76273,Whitesboro,TX,Grayson County,N/A
 76299,Roanoke,TX,Denton County,b
-76439,Dennis,TX,Parker County,
-76462,Lipan,TX,Hood County,
-76467,Paluxy,TX,Hood County,
-76476,Tolar,TX,Hood County,
-76485,Peaster,TX,Parker County,
-76487,Poolville,TX,Parker County,
-76490,Whitt,TX,Parker County,
-76623,Avalon,TX,Ellis County,
-76651,Italy,TX,Ellis County,
-76670,Milford,TX,Ellis County,
+76439,Dennis,TX,Parker County,N/A
+76462,Lipan,TX,Hood County,N/A
+76467,Paluxy,TX,Hood County,N/A
+76476,Tolar,TX,Hood County,N/A
+76485,Peaster,TX,Parker County,N/A
+76487,Poolville,TX,Parker County,N/A
+76490,Whitt,TX,Parker County,N/A
+76623,Avalon,TX,Ellis County,N/A
+76651,Italy,TX,Ellis County,N/A
+76670,Milford,TX,Ellis County,N/A

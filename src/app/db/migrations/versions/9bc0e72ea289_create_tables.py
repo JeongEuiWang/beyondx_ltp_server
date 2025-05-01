@@ -41,8 +41,8 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('client_level',
-    sa.Column('client_level', sa.Enum('DEFAULT', 'SILVER', 'GOLD', 'VIP', name='clientlevelenum'), nullable=False),
+    op.create_table('user_level',
+    sa.Column('user_level', sa.Enum('DEFAULT', 'SILVER', 'GOLD', 'VIP', name='userlevelenum'), nullable=False),
     sa.Column('required_amount', sa.Numeric(precision=16, scale=4), nullable=False),
     sa.Column('discount_rate', sa.Numeric(precision=16, scale=4), nullable=False),
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
@@ -74,30 +74,21 @@ def upgrade() -> None:
     sa.UniqueConstraint('region_id', 'name', name='uq_region_area_name')
     )
     op.create_table('user',
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('email', sa.String(length=255), nullable=False),
     sa.Column('password', sa.String(length=255), nullable=False),
     sa.Column('role_id', sa.Integer(), nullable=False),
-    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=True),
-    sa.Column('updated_at', sa.DateTime(), nullable=True),
-    sa.ForeignKeyConstraint(['role_id'], ['role.id'], ),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('email')
-    )
-    op.create_table('client',
-    sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('first_name', sa.String(length=255), nullable=False),
     sa.Column('last_name', sa.String(length=255), nullable=False),
     sa.Column('phone', sa.String(length=255), nullable=False),
-    sa.Column('client_level_id', sa.Integer(), nullable=False),
+    sa.Column('user_level_id', sa.Integer(), nullable=False),
     sa.Column('total_payment_amount', sa.Numeric(precision=16, scale=4), nullable=False),
-    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
-    sa.ForeignKeyConstraint(['client_level_id'], ['client_level.id'], ),
-    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
+    sa.ForeignKeyConstraint(['user_level_id'], ['user_level.id'], ),
+    sa.ForeignKeyConstraint(['role_id'], ['role.id'], ),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('user_id')
+    sa.UniqueConstraint('email')
     )
     op.create_table('rate_location',
     sa.Column('area_id', sa.Integer(), nullable=False),
@@ -112,8 +103,8 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('area_id', 'zip_code', name='uq_rate_location')
     )
-    op.create_table('client_address',
-    sa.Column('client_id', sa.Integer(), nullable=False),
+    op.create_table('user_address',
+    sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=255), nullable=False),
     sa.Column('state', sa.String(length=255), nullable=False),
     sa.Column('county', sa.String(length=255), nullable=False),
@@ -123,12 +114,12 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
-    sa.ForeignKeyConstraint(['client_id'], ['client.id'], ),
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('quote',
     sa.Column('id', sa.String(length=32), nullable=False),
-    sa.Column('client_id', sa.Integer(), nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('cargo_transportation_id', sa.Integer(), nullable=False),
     sa.Column('is_priority', sa.Boolean(), nullable=False),
     sa.Column('total_weight', sa.Numeric(precision=16, scale=4), nullable=False),
@@ -139,7 +130,7 @@ def upgrade() -> None:
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['cargo_transportation_id'], ['cargo_transportation.id'], ),
-    sa.ForeignKeyConstraint(['client_id'], ['client.id'], ),
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('quote_cargo',
@@ -189,14 +180,13 @@ def downgrade() -> None:
     op.drop_table('quote_location')
     op.drop_table('quote_cargo')
     op.drop_table('quote')
-    op.drop_table('client_address')
+    op.drop_table('user_address')
     op.drop_table('rate_location')
-    op.drop_table('client')
     op.drop_table('user')
-    op.drop_table('rate_area')
+    op.drop_table('user_level')
     op.drop_table('role')
+    op.drop_table('rate_area')
     op.drop_table('rate_region')
-    op.drop_table('client_level')
     op.drop_table('cargo_transportation')
     op.drop_table('cargo_package')
     op.drop_table('cargo_accessorial')

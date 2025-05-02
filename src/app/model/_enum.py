@@ -1,14 +1,17 @@
 from enum import StrEnum
 
+
 class RoleEnum(StrEnum):
     USER = "USER"
     ADMIN = "ADMIN"
+
 
 class UserLevelEnum(StrEnum):
     DEFAULT = "DEFAULT"
     SILVER = "SILVER"
     GOLD = "GOLD"
     VIP = "VIP"
+
 
 class ShippingTypeEnum(StrEnum):
     PICKUP = "PICKUP"
@@ -22,9 +25,11 @@ class OrderStatusEnum(StrEnum):
     REJECT = "REJECT"
     COMPLETED = "COMPLETED"
 
+
 class ShipmentTypeEnum(StrEnum):
     PICKUP = "PICKUP"
     DELIVERY = "DELIVERY"
+
 
 class LocationTypeEnum(StrEnum):
     COMMERCIAL = "COMMERCIAL"

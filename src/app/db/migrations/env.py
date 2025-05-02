@@ -18,6 +18,7 @@ from app.model.user import User, UserLevel, UserAddress, Role
 from app.model.cargo import CargoTransportation, CargoAccessorial, CargoPackage
 from app.model.rate import RateArea, RateRegion, RateLocation
 from app.model.quote import Quote, QuoteLocation, QuoteLocationAccessorial
+
 # 모든 모델 임포트
 
 from app.core.config import get_settings
@@ -81,13 +82,9 @@ def do_async_migrations(connection: Connection) -> None:
     )
     with context.begin_transaction():
         context.run_migrations()
-    
 
 
 if context.is_offline_mode():
     run_migrations_offline()
 else:
     asyncio.run(run_migrations_online())
-
-
-

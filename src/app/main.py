@@ -2,7 +2,10 @@ from fastapi import FastAPI, HTTPException
 from contextlib import asynccontextmanager
 import logging
 
+from .api._router import router as api_router
+
 logger = logging.getLogger(__name__)
+
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
@@ -11,5 +14,14 @@ async def lifespan(_: FastAPI):
     # 데이터베이스는 사전에 생성해야 합니다.
     yield
     logger.warning("Shutting down the application")
-  
-app = FastAPI(lifespan=lifespan)
+
+
+app = FastAPI(
+    title="BeyondX Local Trucking Platform",
+    description="BeyondX Local Trucking Platform API Server",
+    version="0.1.0",
+    lifespan=lifespan,
+)
+
+# API 라우터 등록
+app.include_router(api_router, prefix="/api")

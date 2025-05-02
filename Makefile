@@ -19,10 +19,10 @@ pre: ## Installs or upgrades environment dependencies like Poetry
 
 .PHONY: dev prod
 dev: 
-	ENV=dev poetry run uvicorn --host=localhost --port:8000 app.main:app
+	ENV=dev poetry run uvicorn --host=localhost --port=8000 app.main:app
 
 prod: 
-	ENV=prod poetry run uvicorn --host=0.0.0.0 --port:8000 app.main:app
+	ENV=prod poetry run uvicorn --host=0.0.0.0 --port=8000 app.main:app
 
 .PHONY: migration-dev migration-prod
 migration-dev: 

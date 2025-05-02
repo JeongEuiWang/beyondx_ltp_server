@@ -1,5 +1,15 @@
-
-from sqlalchemy import Column, DateTime, Enum, ForeignKey, Integer, Numeric, String, Text, Boolean, UniqueConstraint
+from sqlalchemy import (
+    Column,
+    DateTime,
+    Enum,
+    ForeignKey,
+    Integer,
+    Numeric,
+    String,
+    Text,
+    Boolean,
+    UniqueConstraint,
+)
 from sqlalchemy.orm import relationship
 from app.db.base import Base
 from app.model._enum import LocationTypeEnum, OrderStatusEnum, ShipmentTypeEnum
@@ -10,20 +20,25 @@ class Quote(TimestampMixin, Base):
     __tablename__ = "quote"
     id = Column(String(32), primary_key=True)
     user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
-    cargo_transportation_id = Column(Integer, ForeignKey("cargo_transportation.id"), nullable=False)
+    cargo_transportation_id = Column(
+        Integer, ForeignKey("cargo_transportation.id"), nullable=False
+    )
     is_priority = Column(Boolean, nullable=False, default=False)
 
     total_weight = Column(Numeric(16, 4), nullable=False)
     total_price = Column(Numeric(16, 4), nullable=False)
 
-    order_status = Column(Enum(OrderStatusEnum), nullable=False, default=OrderStatusEnum.ESTIMATE)
+    order_status = Column(
+        Enum(OrderStatusEnum), nullable=False, default=OrderStatusEnum.ESTIMATE
+    )
     order_primary = Column(String(255), nullable=False)
     order_additional_request = Column(Text)
-    
+
     user = relationship("User", back_populates="quote")
     cargo_transportation = relationship("CargoTransportation", back_populates="quote")
     quote_location = relationship("QuoteLocation", back_populates="quote")
     quote_cargo = relationship("QuoteCargo", back_populates="quote")
+
 
 class QuoteLocation(AutoIntegerIdMixin, Base):
     __tablename__ = "quote_location"
@@ -37,22 +52,33 @@ class QuoteLocation(AutoIntegerIdMixin, Base):
     location_type = Column(Enum(LocationTypeEnum), nullable=False)
     shipment_type = Column(Enum(ShipmentTypeEnum), nullable=False)
     request_datetime = Column(DateTime, nullable=False)
-    
+
     quote = relationship("Quote", back_populates="quote_location")
     __table_args__ = (
-        UniqueConstraint("quote_id", "shipment_type", name="uq_quote_location_shipment_type"),
+        UniqueConstraint(
+            "quote_id", "shipment_type", name="uq_quote_location_shipment_type"
+        ),
     )
+
 
 class QuoteLocationAccessorial(Base):
     __tablename__ = "quote_location_accessorial"
 
-    quote_location_id = Column(Integer, ForeignKey("quote_location.id"), primary_key=True, nullable=False)
-    cargo_accessorial_id = Column(Integer, ForeignKey("cargo_accessorial.id"), primary_key=True, nullable=False)
+    quote_location_id = Column(
+        Integer, ForeignKey("quote_location.id"), primary_key=True, nullable=False
+    )
+    cargo_accessorial_id = Column(
+        Integer, ForeignKey("cargo_accessorial.id"), primary_key=True, nullable=False
+    )
 
-    quote_location = relationship("QuoteLocation", back_populates="quote_location_accessorial")
-    cargo_accessorial = relationship("CargoAccessorial", back_populates="quote_location_accessorial")
+    quote_location = relationship(
+        "QuoteLocation", back_populates="quote_location_accessorial"
+    )
+    cargo_accessorial = relationship(
+        "CargoAccessorial", back_populates="quote_location_accessorial"
+    )
 
-    
+
 class QuoteCargo(AutoIntegerIdMixin, Base):
     __tablename__ = "quote_cargo"
 
@@ -68,4 +94,3 @@ class QuoteCargo(AutoIntegerIdMixin, Base):
     hazardous_detail = Column(Text)
 
     quote = relationship("Quote", back_populates="quote_cargo")
-    

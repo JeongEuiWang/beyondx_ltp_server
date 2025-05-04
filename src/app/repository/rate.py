@@ -9,9 +9,9 @@ class RateRepository:
         self.db_session = db_session
 
     async def get_rate_location_by_query(
-        self, city: Optional[str] = None, zip_code: Optional[str] = None
+        self, region_id: int, city: Optional[str] = None, zip_code: Optional[str] = None
     ) -> List[RateLocation]:
-        query = select(RateLocation)
+        query = select(RateLocation).where(RateLocation.region_id == region_id)
 
         if city is not None and zip_code is not None:
             query = query.where(

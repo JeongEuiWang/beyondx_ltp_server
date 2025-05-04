@@ -9,9 +9,9 @@ class RateService:
         self.rate_repository = rate_repository
 
     async def get_rate_locations(
-        self, city: Optional[str] = None, zip_code: Optional[str] = None
+        self, region_id: int, city: Optional[str] = None, zip_code: Optional[str] = None
     ) -> List[RateLocationResponse]:
         locations = await self.rate_repository.get_rate_location_by_query(
-            city, zip_code
+            region_id, city, zip_code
         )
         return [RateLocationResponse.model_validate(loc) for loc in locations]

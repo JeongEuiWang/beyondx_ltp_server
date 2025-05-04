@@ -10,7 +10,6 @@ class CargoTransportation(AutoIntegerIdMixin, Base):
 
     name = Column(String(255), nullable=False)
     description = Column(String(255), nullable=False)
-    quote = relationship("Quote", back_populates="cargo_transportation")
 
 class CargoPackage(AutoIntegerIdMixin, Base):
     __tablename__ = "cargo_package"
@@ -26,5 +25,3 @@ class CargoAccessorial(AutoIntegerIdMixin, Base):
     name = Column(String(255), nullable=False)
     description = Column(String(255), nullable=False)
 
-    quote_location_accessorial = relationship("QuoteLocationAccessorial", back_populates="cargo_accessorial")
-    

@@ -119,6 +119,7 @@ def upgrade() -> None:
     op.create_table(
         "rate_location",
         sa.Column("area_id", sa.Integer(), nullable=False),
+        sa.Column("region_id", sa.Integer(), nullable=False),
         sa.Column("state", sa.String(length=255), nullable=False),
         sa.Column("county", sa.String(length=255), nullable=False),
         sa.Column("city", sa.String(length=255), nullable=False),
@@ -130,8 +131,22 @@ def upgrade() -> None:
             ["area_id"],
             ["rate_area.id"],
         ),
+        sa.ForeignKeyConstraint(
+            ["region_id"],
+            ["rate_region.id"],
+        ),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("area_id", "zip_code", name="uq_rate_location"),
+    )
+    op.create_index(
+        "ix_rate_location_region_id",
+        "rate_location",
+        ["region_id"],
+    )
+    op.create_index(
+        "ix_rate_location_region_area",
+        "rate_location",
+        ["region_id", "area_id"],
     )
     op.create_table(
         "user_address",

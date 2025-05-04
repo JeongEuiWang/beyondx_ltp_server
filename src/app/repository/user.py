@@ -8,7 +8,6 @@ class UserRepository:
         self.db_session = db_session
 
     async def get_user_by_email(self, email: str):
-        """이메일로 사용자 조회"""
         query = select(User).where(User.email == email)
         result = await self.db_session.execute(query)
         return result.scalar_one_or_none()

@@ -29,8 +29,8 @@ class AuthUser(BaseUser, AccessToken):
 # 로그인
 # --------------------------------
 class LoginRequest(BaseModel):
-    email: EmailStr
-    password: str
+    email: EmailStr = Field(..., description="이메일")
+    password: str = Field(..., description="비밀번호")
 
 
 class LoginResponse(AuthUser):

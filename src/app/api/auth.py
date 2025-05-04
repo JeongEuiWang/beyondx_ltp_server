@@ -13,11 +13,10 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 @router.post("/login", response_model=LoginResponse)
 async def login(
-    request: LoginRequest, auth_service: authServiceDeps, response: Response
+    auth_service: authServiceDeps,
+    request: LoginRequest,
+    response: Response,
 ):
-    """
-    사용자 로그인 API
-    """
     return await auth_service.login(request, response)
 
 

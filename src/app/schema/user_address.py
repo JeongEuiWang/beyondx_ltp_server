@@ -2,6 +2,20 @@ from pydantic import BaseModel, Field
 from typing import List
 from app.model._enum import LocationTypeEnum
 
+# --------------------------------
+# 사용자 주소 공통
+# --------------------------------
+class BaseUserAddress(BaseModel):
+    name: str
+    state: str
+    city: str
+    county: str
+    zip_code: str
+    location_type: LocationTypeEnum
+    address: str
+    class Config:
+        from_attributes = True
+
 
 # --------------------------------
 # 사용자 주소 생성
@@ -12,35 +26,21 @@ class CreateUserAddressRequest(BaseModel):
     city: str = Field(..., description="도시(City)")
     county: str = Field(..., description="카운티(County)")
     zip_code: str = Field(..., description="우편번호")
+    location_type: LocationTypeEnum = Field(..., description="위치 타입")
     address: str = Field(..., description="상세주소")
 
 
-class CreateUserAddressResponse(BaseModel):
-    success: bool
-
-    class Config:
-        from_attributes = True
+class CreateUserAddressResponse(BaseUserAddress):
+    id: int
+    user_id: int
 
 
 # --------------------------------
 # 사용자 주소 조회
 # --------------------------------
-class UserAddressResponse(BaseModel):
+class UserAddressResponse(BaseUserAddress):
     id: int
-    name: str
-    state: str
-    city: str
-    county: str
-    zip_code: str
-    location_type: LocationTypeEnum
-    address: str
-
-    class Config:
-        from_attributes = True
-
-
-class GetUserAddressListResponse(BaseModel):
-    addresses: List[UserAddressResponse]
+    user_id: int
 
     class Config:
         from_attributes = True

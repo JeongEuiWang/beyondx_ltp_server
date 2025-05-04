@@ -11,14 +11,22 @@ class UserAddressRepository:
 
     async def create_user_address(
         self, user_id: int, address_data: CreateUserAddressRequest
-    ):
-        """
-        사용자 주소 생성
-        """
-        pass
+    ) -> UserAddress:
+        new_address = UserAddress(
+            user_id=user_id,
+            name=address_data.name,
+            state=address_data.state,
+            city=address_data.city,
+            county=address_data.county,
+            zip_code=address_data.zip_code,
+            location_type=address_data.location_type,
+            address=address_data.address,
+        )
+        self.db_session.add(new_address)
+        await self.db_session.commit()
+        return new_address
 
     async def get_user_addresses(self, user_id: int) -> List[UserAddress]:
-        """
-        사용자 주소 목록 조회
-        """
-        pass
+        query = select(UserAddress).where(UserAddress.user_id == user_id)
+        result = await self.db_session.execute(query)
+        return result.scalars().all()

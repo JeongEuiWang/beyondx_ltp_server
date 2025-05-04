@@ -8,10 +8,19 @@ class RateRepository:
     def __init__(self, db_session: AsyncSession):
         self.db_session = db_session
 
-    async def get_rate_locations_by_region(
-        self, region_id: int, city: Optional[str] = None, zip_code: Optional[str] = None
+    async def get_rate_location_by_query(
+        self, city: Optional[str] = None, zip_code: Optional[str] = None
     ) -> List[RateLocation]:
-        """
-        지역 정보 조회
-        """
-        pass
+        query = select(RateLocation)
+
+        if city is not None and zip_code is not None:
+            query = query.where(
+                RateLocation.city == city, RateLocation.zip_code == zip_code
+            )
+        elif city is not None:
+            query = query.where(RateLocation.city == city)
+        elif zip_code is not None:
+            query = query.where(RateLocation.zip_code == zip_code)
+        
+        result = await self.db_session.execute(query)
+        return result.scalars().all()

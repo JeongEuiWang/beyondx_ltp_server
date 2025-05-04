@@ -13,24 +13,22 @@ from app.service.rate import RateService
 
 # Service 의존성
 async def get_auth_service(
-    user_repository=userRepositoryDeps,
+    user_repository: userRepositoryDeps,
 ) -> AuthService:
-    return AuthService(
-        user_repository=user_repository,
-    )
+    return AuthService(user_repository)
 
 
-async def get_user_service(user_repository=userRepositoryDeps) -> UserService:
+async def get_user_service(user_repository: userRepositoryDeps) -> UserService:
     return UserService(user_repository)
 
 
 async def get_user_address_service(
-    user_address_repository=userAddressRepositoryDeps,
+    user_address_repository: userAddressRepositoryDeps,
 ) -> UserAddressService:
     return UserAddressService(user_address_repository)
 
 
-async def get_rate_service(rate_repository=rateRepositoryDeps) -> RateService:
+async def get_rate_service(rate_repository: rateRepositoryDeps) -> RateService:
     return RateService(rate_repository)
 
 

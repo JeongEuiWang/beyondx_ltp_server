@@ -131,6 +131,7 @@ def extract_location(file_path: Path) -> list[dict]:
                         temp_row_dict["area_id"] = AREA_MAP[value]
                     else:
                         temp_row_dict["area_id"] = None
+            temp_row_dict["region_id"] = 1 # Texas Region Id
             temp_row_dict["created_at"] = datetime.now(UTC).strftime(
                 "%Y-%m-%d %H:%M:%S"
             )
@@ -146,6 +147,7 @@ def insert_location(location_list: list[dict]) -> None:
     rate_location_table = sa.table(
         "rate_location",
         sa.column("id", sa.Integer),
+        sa.column("region_id", sa.Integer),
         sa.column("area_id", sa.Integer),
         sa.column("state", sa.String),
         sa.column("county", sa.String),

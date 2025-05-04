@@ -3,6 +3,7 @@ from pydantic import EmailStr
 from typing import List
 
 from app.core.auth import requiredAuthDeps
+from app.schema.user_level import UserLevelResponse
 
 from ..schema.user import (
     CreateUserRequest,
@@ -16,7 +17,11 @@ from ..schema.user_address import (
     CreateUserAddressResponse,
     UserAddressResponse,
 )
-from ..service._deps import userServiceDeps, userAddressServiceDeps
+from ..service._deps import (
+    userServiceDeps,
+    userAddressServiceDeps,
+    userLevelServiceDeps,
+)
 
 router = APIRouter(prefix="/user", tags=["user"])
 
@@ -70,3 +75,12 @@ async def get_user_address(
     user_address_service: userAddressServiceDeps, token_data: requiredAuthDeps
 ):
     return await user_address_service.get_user_addresses(token_data.user_id)
+
+
+@router.get(
+    "/levels",
+    response_model=List[UserLevelResponse],
+    status_code=status.HTTP_200_OK,
+)
+async def get_user_level(user_level_service: userLevelServiceDeps):
+    return await user_level_service.get_user_levels()

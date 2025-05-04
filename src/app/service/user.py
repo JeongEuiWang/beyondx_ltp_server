@@ -34,10 +34,8 @@ class UserService:
         return CreateUserResponse(success=True)
 
     async def get_user_info(self, user_id: int) -> GetUserInfoResponse:
-        """
-        사용자 정보 조회
-        """
         user = await self.user_repository.get_user_by_id(user_id)
+        print(user)
         return GetUserInfoResponse(
             id=user.id,
             email=user.email,

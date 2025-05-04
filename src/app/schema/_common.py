@@ -5,7 +5,6 @@ from pydantic import EmailStr
 class BaseUser(BaseModel):
     id: int
     email: EmailStr
-    role_id: int
     first_name: str
     last_name: str
     phone: str

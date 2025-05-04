@@ -4,6 +4,7 @@ from ..repository.user import UserRepository
 from ..repository.user_address import UserAddressRepository
 from ..repository.rate import RateRepository
 from ..repository.cargo import CargoRepository
+from ..repository.user_level import UserLevelRepository
 from typing import Annotated
 
 
@@ -24,9 +25,14 @@ def get_cargo_repository(session: sessionDeps) -> CargoRepository:
     return CargoRepository(db_session=session)
 
 
+def get_user_level_repository(session: sessionDeps) -> UserLevelRepository:
+    return UserLevelRepository(db_session=session)
+
+
 userRepositoryDeps = Annotated[UserRepository, Depends(get_user_repository)]
 userAddressRepositoryDeps = Annotated[
     UserAddressRepository, Depends(get_user_address_repository)
 ]
 rateRepositoryDeps = Annotated[RateRepository, Depends(get_rate_repository)]
 cargoRepositoryDeps = Annotated[CargoRepository, Depends(get_cargo_repository)]
+userLevelRepositoryDeps = Annotated[UserLevelRepository, Depends(get_user_level_repository)]

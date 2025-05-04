@@ -1,4 +1,3 @@
-
 from fastapi import HTTPException
 from typing import Optional
 from ..schema.cargo import CargoTransportationResponse, CargoAccessorialResponse
@@ -13,7 +12,7 @@ class CargoService:
         self,
     ) -> List[CargoTransportationResponse]:
         locations = await self.cargo_repository.get_cargo_transportation()
-        return [CargoTransportationResponse.model_validate(loc) for loc in locations],
+        return [CargoTransportationResponse.model_validate(loc) for loc in locations]
       
     async def get_cargo_accessorial(
         self,

@@ -7,10 +7,12 @@ from app.repository._deps import (
     userAddressRepositoryDeps,
     rateRepositoryDeps,
     cargoRepositoryDeps,
+    userLevelRepositoryDeps,
 )
 from app.service.user_address import UserAddressService
 from app.service.rate import RateService
 from app.service.cargo import CargoService
+from app.service.user_level import UserLevelService
 
 # Service 의존성
 async def get_auth_service(
@@ -37,10 +39,17 @@ async def get_cargo_service(cargo_repository: cargoRepositoryDeps) -> CargoServi
     return CargoService(cargo_repository)
 
 
+async def get_user_level_service(user_level_repository: userLevelRepositoryDeps) -> UserLevelService:
+    return UserLevelService(user_level_repository)
+
+
 authServiceDeps = Annotated[AuthService, Depends(get_auth_service)]
 userServiceDeps = Annotated[UserService, Depends(get_user_service)]
 userAddressServiceDeps = Annotated[
     UserAddressService, Depends(get_user_address_service)
+]
+userLevelServiceDeps = Annotated[
+    UserLevelService, Depends(get_user_level_service)
 ]
 rateServiceDeps = Annotated[RateService, Depends(get_rate_service)]
 cargoServiceDeps = Annotated[CargoService, Depends(get_cargo_service)]

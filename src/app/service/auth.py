@@ -47,7 +47,6 @@ class AuthService:
         return LoginResponse(
             id=user.id,
             email=user.email,
-            role_id=user.role_id,
             first_name=user.first_name,
             last_name=user.last_name,
             phone=user.phone,
@@ -83,7 +82,6 @@ class AuthService:
         return RefreshTokenResponse(
             id=user.id,
             email=user.email,
-            role_id=user.role_id,
             first_name=user.first_name,
             last_name=user.last_name,
             phone=user.phone,

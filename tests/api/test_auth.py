@@ -17,7 +17,7 @@ class TestAuthAPI:
         """로그인 성공 테스트"""
         # 먼저 회원가입
         user_data = {
-            "email": "auth_test@example.com",
+            "email": "unique_auth_test@example.com",
             "password": "StrongPassword123!",
             "first_name": "길동",
             "last_name": "홍",
@@ -27,7 +27,7 @@ class TestAuthAPI:
 
         # 로그인 요청
         login_data = {
-            "email": "auth_test@example.com",
+            "email": "unique_auth_test@example.com",
             "password": "StrongPassword123!",
         }
 

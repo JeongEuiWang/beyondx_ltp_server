@@ -45,7 +45,7 @@ async def sign_up(user_data: CreateUserRequest, user_service: userServiceDeps):
     return await user_service.create_user(user_data)
 
 
-@router.get("/", response_model=GetUserInfoResponse, status_code=status.HTTP_200_OK)
+@router.get("/me", response_model=GetUserInfoResponse, status_code=status.HTTP_200_OK)
 async def get_user_info(user_service: userServiceDeps, token_data: requiredAuthDeps):
     return await user_service.get_user_info(token_data.user_id)
 
@@ -58,9 +58,7 @@ async def create_user_address(
     user_service: userServiceDeps,
     token_data: requiredAuthDeps,
 ):
-    return await user_service.create_user_address(
-        token_data.user_id, address_data
-    )
+    return await user_service.create_user_address(token_data.user_id, address_data)
 
 
 @router.get(
@@ -68,7 +66,5 @@ async def create_user_address(
     response_model=List[UserAddressResponse],
     status_code=status.HTTP_200_OK,
 )
-async def get_user_address(
-    user_service: userServiceDeps, token_data: requiredAuthDeps
-):
+async def get_user_address(user_service: userServiceDeps, token_data: requiredAuthDeps):
     return await user_service.get_user_addresses(token_data.user_id)

@@ -7,7 +7,9 @@ def transactional():
         @functools.wraps(func)
         async def wrapper(self, *args, **kwargs):
             if not hasattr(self, "db") or self.db is None:
-                raise ValueError("No Session Found")
+                # 현재 self.db는 외부에서 설정되지 않고 있습니다
+                # 서비스 클래스에 db 속성이 없으면 에러 발생
+                raise ValueError("No DB Session Found")
 
             db = self.db
             try:

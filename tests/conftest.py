@@ -11,12 +11,14 @@ from app.core.config import settings
 from app.db.base import Base
 from app.main import app
 from app.db.session import get_async_session
+from app.core.auth import get_current_user, TokenData
+from app.model.user import UserLevel, Role
+from app.model._enum import UserLevelEnum, RoleEnum
 
-# 테스트용 SQLite 데이터베이스 경로
-TEST_DB_PATH = "test_db.sqlite"
-TEST_DB_URL = f"sqlite+aiosqlite:///{TEST_DB_PATH}"
+# 테스트용 SQLite 인메모리 데이터베이스 사용
+TEST_DB_URL = "sqlite+aiosqlite:///:memory:"
 
-# 비동기 엔진과 세션 생성 (SQLite 사용)
+# 비동기 엔진과 세션 생성 (SQLite 인메모리 사용)
 test_engine = create_async_engine(
     TEST_DB_URL, connect_args={"check_same_thread": False}
 )
@@ -33,22 +35,58 @@ def event_loop() -> Generator[asyncio.AbstractEventLoop, None, None]:
     loop.close()
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 async def setup_database() -> AsyncGenerator[None, None]:
     """테스트 데이터베이스 설정 및 테이블 생성"""
     # 테이블 생성
     async with test_engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
+        
+    # 필수 초기 데이터 생성 (user_level, role)
+    async with TestingSessionLocal() as session:
+        # 기본 사용자 레벨 생성
+        default_level = UserLevel(
+            id=1,
+            user_level=UserLevelEnum.DEFAULT,
+            required_amount=0,
+            discount_rate=0
+        )
+        silver_level = UserLevel(
+            id=2,
+            user_level=UserLevelEnum.SILVER,
+            required_amount=1000000,
+            discount_rate=0.03
+        )
+        gold_level = UserLevel(
+            id=3,
+            user_level=UserLevelEnum.GOLD,
+            required_amount=5000000,
+            discount_rate=0.05
+        )
+        vip_level = UserLevel(
+            id=4,
+            user_level=UserLevelEnum.VIP,
+            required_amount=10000000,
+            discount_rate=0.1
+        )
+        
+        # 사용자 역할 생성
+        admin_role = Role(id=1, role=RoleEnum.ADMIN)
+        user_role = Role(id=2, role=RoleEnum.USER)
+        
+        # 데이터베이스에 추가
+        session.add_all([
+            default_level, silver_level, gold_level, vip_level,
+            admin_role, user_role
+        ])
+        await session.commit()
 
     yield
 
     # 테스트 후 정리
     async with test_engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
-
-    # SQLite 파일 삭제
-    if os.path.exists(TEST_DB_PATH):
-        os.remove(TEST_DB_PATH)
 
 
 @pytest.fixture
@@ -68,11 +106,23 @@ async def client(db_session) -> AsyncGenerator[AsyncClient, None]:
     async def override_get_async_session() -> AsyncGenerator[AsyncSession, None]:
         yield db_session
 
+    # 인증 의존성 오버라이드 - 테스트용 토큰 데이터 반환
+    async def override_auth():
+        return TokenData(user_id=1, role_id=1)  # 테스트 환경에서 기본 사용자 ID 1, 역할 ID 1 사용
+    
+    # 의존성 오버라이드 설정
     app.dependency_overrides[get_async_session] = override_get_async_session
+    
+    # 인증 의존성은 테스트에서 개별적으로 처리하도록 함
+    # app.dependency_overrides[get_current_user] = override_auth
 
     # ASGITransport 사용하여 AsyncClient 생성
     transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as client:
+    async with AsyncClient(
+        transport=transport, 
+        base_url="http://test", 
+        follow_redirects=True
+    ) as client:
         yield client
 
     # 테스트 후 의존성 복원

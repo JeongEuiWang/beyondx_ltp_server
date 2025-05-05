@@ -21,6 +21,7 @@ class User(AutoIntegerIdMixin, TimestampMixin, Base):
     user_level = relationship("UserLevel", back_populates="user")
     user_address = relationship("UserAddress", back_populates="user")
     role = relationship("Role", back_populates="user")
+    quote = relationship("Quote", back_populates="user")
 
 class UserLevel(AutoIntegerIdMixin, Base):
     __tablename__ = "user_level"

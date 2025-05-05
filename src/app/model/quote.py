@@ -31,7 +31,7 @@ class Quote(TimestampMixin, Base):
     order_status = Column(
         Enum(OrderStatusEnum), nullable=False, default=OrderStatusEnum.ESTIMATE
     )
-    order_primary = Column(String(255), nullable=False)
+    order_primary = Column(String(255))
     order_additional_request = Column(Text)
 
     user = relationship("User", back_populates="quote")
@@ -54,6 +54,7 @@ class QuoteLocation(AutoIntegerIdMixin, Base):
     request_datetime = Column(DateTime, nullable=False)
 
     quote = relationship("Quote", back_populates="quote_location")
+    quote_location_accessorial = relationship("QuoteLocationAccessorial", back_populates="quote_location")
     __table_args__ = (
         UniqueConstraint(
             "quote_id", "shipment_type", name="uq_quote_location_shipment_type"

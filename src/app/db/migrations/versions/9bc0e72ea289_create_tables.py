@@ -76,10 +76,9 @@ def upgrade() -> None:
         "rate_area",
         sa.Column("region_id", sa.Integer(), nullable=False),
         sa.Column("name", sa.String(length=255), nullable=False),
-        sa.Column(
-            "min_order_amount", sa.Numeric(precision=16, scale=4), nullable=False
-        ),
+        sa.Column("min_load", sa.Numeric(precision=16, scale=4), nullable=False),
         sa.Column("max_load", sa.Numeric(precision=16, scale=4), nullable=False),
+        sa.Column("max_load_weight", sa.Integer()),
         sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
         sa.Column("created_at", sa.DateTime(), nullable=True),
         sa.Column("updated_at", sa.DateTime(), nullable=True),
@@ -89,6 +88,19 @@ def upgrade() -> None:
         ),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("region_id", "name", name="uq_region_area_name"),
+    )
+    op.create_table(
+        "rate_area_cost",
+        sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
+        sa.Column("area_id", sa.Integer(), nullable=False),
+        sa.Column("min_weight", sa.Integer()),
+        sa.Column("max_weight", sa.Integer()),
+        sa.Column("price_per_weight", sa.Numeric(precision=16, scale=4)),
+        sa.ForeignKeyConstraint(
+            ["area_id"],
+            ["rate_area.id"],
+        ),
+        sa.PrimaryKeyConstraint("id"),
     )
     op.create_table(
         "user",
@@ -191,7 +203,7 @@ def upgrade() -> None:
             ),
             nullable=False,
         ),
-        sa.Column("order_primary", sa.String(length=255), nullable=False),
+        sa.Column("order_primary", sa.String(length=255), nullable=True),
         sa.Column("order_additional_request", sa.Text(), nullable=True),
         sa.Column("created_at", sa.DateTime(), nullable=True),
         sa.Column("updated_at", sa.DateTime(), nullable=True),
@@ -282,6 +294,7 @@ def downgrade() -> None:
     op.drop_table("user")
     op.drop_table("user_level")
     op.drop_table("role")
+    op.drop_table("rate_area_cost")
     op.drop_table("rate_area")
     op.drop_table("rate_region")
     op.drop_table("cargo_transportation")

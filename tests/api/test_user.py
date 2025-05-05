@@ -59,30 +59,35 @@ class TestUserRegister:
         """사용자 정보 조회 테스트"""
         # 먼저 회원가입
         user_data = {
-            "email": "info_test@example.com",
+            "email": "unique_info_test@example.com",
             "password": "StrongPassword123!",
             "first_name": "정보",
             "last_name": "조회",
             "phone": "010-8765-4321",
         }
-        await client.post("/api/user/sign-up", json=user_data)
+        sign_up_response = await client.post("/api/user/sign-up", json=user_data)
+        assert sign_up_response.status_code == 200
 
         # 로그인하여 토큰 획득
         login_data = {
-            "email": "info_test@example.com",
+            "email": "unique_info_test@example.com",
             "password": "StrongPassword123!",
         }
         login_response = await client.post("/api/auth/login", json=login_data)
+        assert login_response.status_code == 200
         access_token = login_response.json()["access"]["token"]
-
+        
         # 사용자 정보 조회
         response = await client.get(
-            "/api/user/",
+            "/api/user/me",
             headers={"Authorization": f"Bearer {access_token}"}
         )
 
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
+        
+        # 응답 내용 출력하여 확인
+        print(f"Response data: {data}")
         
         # 응답에 필요한 필드들이 있는지 확인
         assert "id" in data
@@ -91,10 +96,16 @@ class TestUserRegister:
         assert "last_name" in data
         assert "phone" in data
         assert "total_payment_amount" in data
-        assert "user_level_id" in data
+        assert "user_level" in data
+        
+        # user_level 객체 확인
+        assert "id" in data["user_level"]
+        assert "level" in data["user_level"]
+        assert "required_amount" in data["user_level"]
+        assert "discount_rate" in data["user_level"]
         
         # 가입한 사용자 정보가 올바른지 확인
-        assert data["email"] == "info_test@example.com"
-        assert data["first_name"] == "정보"
-        assert data["last_name"] == "조회"
-        assert data["phone"] == "010-8765-4321"
+        assert data["email"] == user_data["email"]
+        assert data["first_name"] == user_data["first_name"]
+        assert data["last_name"] == user_data["last_name"]
+        assert data["phone"] == user_data["phone"]

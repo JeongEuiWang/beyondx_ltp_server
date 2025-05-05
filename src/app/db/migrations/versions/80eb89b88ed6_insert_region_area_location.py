@@ -72,8 +72,9 @@ def insert_area() -> None:
         sa.column("id", sa.Integer),
         sa.column("region_id", sa.Integer),
         sa.column("name", sa.String),
-        sa.column("min_order_amount", sa.Numeric(16, 4)),
+        sa.column("min_load", sa.Numeric(16, 4)),
         sa.column("max_load", sa.Numeric(16, 4)),
+        sa.column("max_load_weight", sa.Integer),
         sa.column("created_at", sa.TIMESTAMP),
         sa.column("updated_at", sa.TIMESTAMP),
     )
@@ -85,8 +86,9 @@ def insert_area() -> None:
                 "id": 1,
                 "region_id": 1,
                 "name": "A",
-                "min_order_amount": 25,
+                "min_load": 25,
                 "max_load": 225,
+                "max_load_weight": 5000,
                 "created_at": datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S"),
                 "updated_at": datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S"),
             },
@@ -94,8 +96,9 @@ def insert_area() -> None:
                 "id": 2,
                 "region_id": 1,
                 "name": "B",
-                "min_order_amount": 30,
+                "min_load": 30,
                 "max_load": 250,
+                "max_load_weight": 5000,
                 "created_at": datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S"),
                 "updated_at": datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S"),
             },
@@ -103,14 +106,102 @@ def insert_area() -> None:
                 "id": 3,
                 "region_id": 1,
                 "name": "C",
-                "min_order_amount": 35,
+                "min_load": 35,
                 "max_load": 275,
+                "max_load_weight": 5000,
                 "created_at": datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S"),
                 "updated_at": datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S"),
             },
         ],
     )
-    pass
+
+
+def insert_area_cost() -> None:
+    rate_area_cost_table = sa.table(
+        "rate_area_cost",
+        sa.column("id", sa.Integer),
+        sa.column("area_id", sa.Integer),
+        sa.column("min_weight", sa.Integer),
+        sa.column("max_weight", sa.Integer),
+        sa.column("price_per_weight", sa.Numeric(16, 4)),
+    )
+    op.bulk_insert(
+        rate_area_cost_table,
+        [
+            {
+                "area_id": 1,
+                "min_weight": 1,
+                "max_weight": 1000,
+                "price_per_weight": 0.0525,
+            },
+            {
+                "area_id": 1,
+                "min_weight": 1001,
+                "max_weight": 2000,
+                "price_per_weight": 0.05,
+            },
+            {
+                "area_id": 1,
+                "min_weight": 2001,
+                "max_weight": 3000,
+                "price_per_weight": 0.0475,
+            },
+            {
+                "area_id": 1,
+                "min_weight": 3001,
+                "max_weight": 5000,
+                "price_per_weight": 0.045,
+            },
+            {
+                "area_id": 2,
+                "min_weight": 1,
+                "max_weight": 1000,
+                "price_per_weight": 0.0625,
+            },
+            {
+                "area_id": 2,
+                "min_weight": 1001,
+                "max_weight": 2000,
+                "price_per_weight": 0.06,
+            },
+            {
+                "area_id": 2,
+                "min_weight": 2001,
+                "max_weight": 3000,
+                "price_per_weight": 0.0575,
+            },
+            {
+                "area_id": 2,
+                "min_weight": 3001,
+                "max_weight": 5000,
+                "price_per_weight": 0.055,
+            },
+            {
+                "area_id": 3,
+                "min_weight": 1,
+                "max_weight": 1000,
+                "price_per_weight": 0.0725,
+            },
+            {
+                "area_id": 3,
+                "min_weight": 1001,
+                "max_weight": 2000,
+                "price_per_weight": 0.07,
+            },
+            {
+                "area_id": 3,
+                "min_weight": 2001,
+                "max_weight": 3000,
+                "price_per_weight": 0.0675,
+            },
+            {
+                "area_id": 3,
+                "min_weight": 3001,
+                "max_weight": 5000,
+                "price_per_weight": 0.065,
+            },
+        ],
+    )
 
 
 def extract_location(file_path: Path) -> list[dict]:
@@ -131,7 +222,7 @@ def extract_location(file_path: Path) -> list[dict]:
                         temp_row_dict["area_id"] = AREA_MAP[value]
                     else:
                         temp_row_dict["area_id"] = None
-            temp_row_dict["region_id"] = 1 # Texas Region Id
+            temp_row_dict["region_id"] = 1  # Texas Region Id
             temp_row_dict["created_at"] = datetime.now(UTC).strftime(
                 "%Y-%m-%d %H:%M:%S"
             )
@@ -166,6 +257,7 @@ def upgrade() -> None:
     insert_area()
     location_list = extract_location(FILE_PATH)
     insert_location(location_list)
+    insert_area_cost()
 
 
 def downgrade() -> None:

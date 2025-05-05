@@ -8,9 +8,10 @@ class UserLevelRepository:
     def __init__(self, db_session: AsyncSession):
         self.db_session = db_session
 
-    async def get_user_levels(
+    async def get_level_by_id(
         self,
-    ) -> List[UserLevel]:
-        query = select(UserLevel)
+        id: int,
+    ) -> UserLevel:
+        query = select(UserLevel).where(UserLevel.id == id)
         result = await self.db_session.execute(query)
-        return result.scalars().all()
+        return result.scalar_one_or_none()

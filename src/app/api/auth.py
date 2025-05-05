@@ -1,6 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Response, Cookie
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from typing import Annotated, Optional
+from fastapi import APIRouter, HTTPException, status, Response
 
 from ..schema.auth import LoginRequest, LoginResponse, RefreshTokenResponse
 from ..service._deps import authServiceDeps

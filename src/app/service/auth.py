@@ -1,11 +1,8 @@
-from typing import Optional, Dict, Any
-from datetime import UTC, datetime, timedelta
-
+from datetime import UTC, datetime
 from fastapi import HTTPException, status, Response
-
 from ..schema.auth import LoginRequest, LoginResponse, RefreshTokenResponse
 from ..core.auth import TokenData
-from ..core.security import verify_password, get_password_hash
+from ..core.security import verify_password
 from ..core.jwt import create_access_token, create_refresh_token
 from ..repository.user import UserRepository
 from ..core.config import settings

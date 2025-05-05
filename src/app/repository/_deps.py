@@ -17,6 +17,10 @@ def get_user_address_repository(session: sessionDeps) -> UserAddressRepository:
     return UserAddressRepository(db_session=session)
 
 
+def get_user_level_repository(session: sessionDeps) -> UserLevelRepository:
+    return UserLevelRepository(db_session=session)
+
+
 def get_rate_repository(session: sessionDeps) -> RateRepository:
     return RateRepository(db_session=session)
   
@@ -25,8 +29,6 @@ def get_cargo_repository(session: sessionDeps) -> CargoRepository:
     return CargoRepository(db_session=session)
 
 
-def get_user_level_repository(session: sessionDeps) -> UserLevelRepository:
-    return UserLevelRepository(db_session=session)
 
 
 userRepositoryDeps = Annotated[UserRepository, Depends(get_user_repository)]

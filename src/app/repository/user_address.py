@@ -26,7 +26,7 @@ class UserAddressRepository:
         await self.db_session.commit()
         return new_address
 
-    async def get_user_addresses(self, user_id: int) -> List[UserAddress]:
+    async def get_user_addresses_by_id(self, user_id: int) -> List[UserAddress]:
         query = select(UserAddress).where(UserAddress.user_id == user_id)
         result = await self.db_session.execute(query)
         return result.scalars().all()

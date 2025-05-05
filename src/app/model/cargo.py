@@ -1,6 +1,4 @@
-
-from sqlalchemy import Column, Integer, Numeric, String
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, Integer, String
 from app.db.base import Base
 from app.model._mixin import AutoIntegerIdMixin
 
@@ -11,6 +9,7 @@ class CargoTransportation(AutoIntegerIdMixin, Base):
     name = Column(String(255), nullable=False)
     description = Column(String(255), nullable=False)
 
+
 class CargoPackage(AutoIntegerIdMixin, Base):
     __tablename__ = "cargo_package"
 
@@ -19,9 +18,9 @@ class CargoPackage(AutoIntegerIdMixin, Base):
     length = Column(Integer, nullable=True)
     height = Column(Integer, nullable=True)
 
+
 class CargoAccessorial(AutoIntegerIdMixin, Base):
     __tablename__ = "cargo_accessorial"
 
     name = Column(String(255), nullable=False)
     description = Column(String(255), nullable=False)
-

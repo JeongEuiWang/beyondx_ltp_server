@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr, Field
-from ._common import BaseUser
+from app.model._enum import UserLevelEnum
 
 
 # --------------------------------
@@ -33,5 +33,21 @@ class CreateUserResponse(BaseModel):
 # --------------------------------
 # 사용자 정보 조회
 # --------------------------------
-class GetUserInfoResponse(BaseUser):
-    pass
+class UserLevel(BaseModel):
+    id: int
+    level: UserLevelEnum
+    required_amount: float
+    discount_rate: float
+
+
+class GetUserInfoResponse(BaseModel):
+    id: int
+    email: EmailStr
+    first_name: str
+    last_name: str
+    phone: str
+    total_payment_amount: float
+    user_level: UserLevel
+
+    class Config:
+        from_attributes = True

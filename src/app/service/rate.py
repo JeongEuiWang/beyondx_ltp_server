@@ -4,6 +4,7 @@ from ..schema.rate import RateLocationResponse
 from ..repository.rate import RateRepository
 from typing import List
 
+
 class RateService:
     def __init__(self, rate_repository: RateRepository):
         self.rate_repository = rate_repository

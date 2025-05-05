@@ -2,7 +2,9 @@ from fastapi import APIRouter, Query, Depends, status, Path
 from typing import Optional, List
 from ..service._deps import cargoServiceDeps
 from ..schema.cargo import CargoTransportationResponse, CargoAccessorialResponse
+
 router = APIRouter(prefix="/cargo", tags=["cargo"])
+
 
 @router.get(
     "/transportation",
@@ -13,6 +15,7 @@ async def get_cargo_transportation(
     cargo_service: cargoServiceDeps,
 ):
     return await cargo_service.get_cargo_transportation()
+
 
 @router.get(
     "/accessorial",

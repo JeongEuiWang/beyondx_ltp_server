@@ -1,6 +1,5 @@
 from pydantic import BaseModel, EmailStr, Field
 from datetime import datetime
-from ._common import BaseUser
 
 
 # --------------------------------
@@ -9,6 +8,19 @@ from ._common import BaseUser
 class BaseToken(BaseModel):
     token: str
     expires_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class BaseUser(BaseModel):
+    id: int
+    email: EmailStr
+    first_name: str
+    last_name: str
+    phone: str
+    total_payment_amount: float
+    user_level_id: int
 
     class Config:
         from_attributes = True

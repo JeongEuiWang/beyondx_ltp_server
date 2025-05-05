@@ -23,3 +23,6 @@ class ExtraCost(CostModel):
 class LocationCost(CostModel):
     pass
 
+class DiscountCost(CostModel):
+  pass
+

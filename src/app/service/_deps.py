@@ -18,6 +18,7 @@ from app.service.quote import QuoteService
 from app.service.cost import CostService
 from app.repository._deps import sessionDeps
 
+
 # Service 의존성
 async def get_auth_service(
     user_repository: userRepositoryDeps,
@@ -52,16 +53,18 @@ async def get_quote_service(
     session: sessionDeps,
 ) -> QuoteService:
     service = QuoteService(
-        quote_repository, 
-        quote_location_repository, 
-        quote_cargo_repository
+        quote_repository, quote_location_repository, quote_cargo_repository
     )
     service.db = session  # DB 세션 설정
     return service
 
 
-async def get_cost_service(rate_repository: rateRepositoryDeps) -> CostService:
-    return CostService(rate_repository)
+async def get_cost_service(
+    rate_repository: rateRepositoryDeps,
+    user_repository: userRepositoryDeps,
+    user_level_repository: userLevelRepositoryDeps,
+) -> CostService:
+    return CostService(rate_repository, user_repository, user_level_repository)
 
 
 authServiceDeps = Annotated[AuthService, Depends(get_auth_service)]

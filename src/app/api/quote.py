@@ -21,18 +21,22 @@ async def create_quote(
     token_data: requiredAuthDeps,
     request: CreateQuoteRequest,
 ):
-    base_cost = await cost_service.calculate_base_cost(request.cargo, request.from_location, request.to_location)
-    location_type_cost = await cost_service.calculate_location_type_cost(request.from_location, request.to_location, base_cost)
-    extra_cost = await cost_service.calculate_extra_cost(request.is_priority, request.from_location, request.to_location, base_cost)
-    
-    print("base_cost", base_cost)
-    print("location_type_cost", location_type_cost)
-    print("extra_cost", extra_cost)
-    
+    base_cost = await cost_service.calculate_base_cost(
+        request.cargo, request.from_location, request.to_location
+    )
+    location_type_cost = await cost_service.calculate_location_type_cost(
+        request.from_location, request.to_location, base_cost
+    )
+    extra_cost = await cost_service.calculate_extra_cost(
+        request.is_priority, request.from_location, request.to_location, base_cost
+    )
+    total_cost = base_cost.cost + location_type_cost.cost + extra_cost.cost
+    discount_cost = await cost_service.calculate_discount(
+        token_data.user_id, total_cost
+    )
     return await quote_service.create_quote(
         user_id=token_data.user_id,
         quote=request,
-        base_cost=base_cost,
-        location_type_cost=location_type_cost,
-        extra_cost=extra_cost,
+        total_weight=base_cost.freight_weight,
+        total_cost=discount_cost,
     )

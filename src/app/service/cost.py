@@ -1,18 +1,28 @@
 from decimal import Decimal
 
 from app.repository.rate import RateRepository
+from app.repository.user import UserRepository
+from app.repository.user_level import UserLevelRepository
 from app.schema.quote import QuoteLocationRequest
 from app.service.cost_builder import (
     BaseCostBuilder,
     ExtraCostBuilder,
     LocationCostBuilder,
+    DiscountBuilder,
 )
-from app.schema.cost import BaseCost, ExtraCost, LocationCost
+from app.schema.cost import BaseCost, DiscountCost, ExtraCost, LocationCost
 
 
 class CostService:
-    def __init__(self, rate_repository: RateRepository):
+    def __init__(
+        self,
+        rate_repository: RateRepository,
+        user_repository: UserRepository,
+        user_level_repository: UserLevelRepository,
+    ):
         self.rate_repository = rate_repository
+        self.user_level_repository = user_level_repository
+        self.user_repository = user_repository
 
     async def calculate_base_cost(
         self,
@@ -83,4 +93,24 @@ class CostService:
         builder.calculate_accesserial(to_location)
         builder.calculate_service_extra_cost(is_priority, from_location)
         builder.calculate_service_extra_cost(is_priority, to_location)
+        return builder.calculate()
+
+    async def calculate_discount(
+        self,
+        user_id: int,
+        total_cost: Decimal,
+    ) -> DiscountCost:
+        builder = DiscountBuilder(total_cost=total_cost)
+        user = await self.user_repository.get_user_by_id(user_id)
+        if user is None:
+            raise Exception("사용자 조회 중 오류가 발생했습니다.")
+
+        user_level = await self.user_level_repository.get_level_by_id(
+            user.user_level_id
+        )
+        if user_level is None:
+            raise Exception("사용자 레벨 조회 중 오류가 발생했습니다.")
+
+        builder.calculate_discount(user_level)
+
         return builder.calculate()

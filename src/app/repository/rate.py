@@ -25,7 +25,7 @@ class RateRepository:
 
         result = await self.db_session.execute(query)
         return result.scalars().all()
-      
+
     async def get_area_by_zip_code(self, zip_code: str) -> Optional[RateArea]:
         query = (
             select(RateArea)

@@ -1,13 +1,19 @@
 from decimal import Decimal
 from typing import List, Dict, Set
+from fastapi import HTTPException, status
 from app.core.decorator import transactional
 from app.model._enum import ShipmentTypeEnum
-from ..schema.quote import CreateQuoteRequest, UpdateQuoteRequest, QuoteCargoRequest
+from ..schema.quote import (
+    CreateQuoteRequest,
+    GetQuoteDetailsResponse,
+    QuoteLocationAccessorialSchema,
+    QuoteLocationSchema,
+    UpdateQuoteRequest,
+)
 from ..repository.quote import QuoteRepository
 from ..repository.quote_location import QuoteLocationRepository
 from ..repository.quote_location_accessorial import QuoteLocationAccessorialRepository
 from ..repository.quote_cargo import QuoteCargoRepository
-from ..model.quote import QuoteLocationAccessorial, QuoteCargo
 
 
 class QuoteService:

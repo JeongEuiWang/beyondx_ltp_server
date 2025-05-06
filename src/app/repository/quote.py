@@ -13,12 +13,9 @@ class QuoteRepository:
 
     async def get_quote_by_id(self, quote_id: str, user_id: int) -> Optional[Quote]:
         result = await self.db_session.execute(
-            select(Quote).where(
-                Quote.id == quote_id,
-                Quote.user_id == user_id
-            )
+            select(Quote).where(Quote.id == quote_id, Quote.user_id == user_id)
         )
-        return result.scalars().first()
+        return result.scalar_one_or_none()
 
     async def create_quote(
         self,
@@ -66,7 +63,7 @@ class QuoteRepository:
             "extra_price": extra_price,
             "total_price": total_price_with_discount,
         }
-        
+
         # 견적 업데이트
         await self.db_session.execute(
             update(Quote)
@@ -74,6 +71,6 @@ class QuoteRepository:
             .values(**values)
         )
         await self.db_session.flush()
-        
+
         # 업데이트된 견적 반환
         return await self.get_quote_by_id(quote_id, user_id)

@@ -3,7 +3,7 @@ from decimal import Decimal
 from app.repository.rate import RateRepository
 from app.repository.user import UserRepository
 from app.repository.user_level import UserLevelRepository
-from app.schema.quote import QuoteLocationRequest
+from app.schema.quote import QuoteLocationSchema
 from app.service.cost_builder import (
     BaseCostBuilder,
     ExtraCostBuilder,
@@ -27,8 +27,8 @@ class CostService:
     async def calculate_base_cost(
         self,
         cargo_list,
-        from_location: QuoteLocationRequest,
-        to_location: QuoteLocationRequest,
+        from_location: QuoteLocationSchema,
+        to_location: QuoteLocationSchema,
     ) -> BaseCost:
         builder = BaseCostBuilder(fsc=Decimal("0.35"))
         for cargo in cargo_list:
@@ -71,8 +71,8 @@ class CostService:
 
     async def calculate_location_type_cost(
         self,
-        from_location: QuoteLocationRequest,
-        to_location: QuoteLocationRequest,
+        from_location: QuoteLocationSchema,
+        to_location: QuoteLocationSchema,
         base_cost: BaseCost,
     ) -> LocationCost:
         builder = LocationCostBuilder(base_cost=base_cost)
@@ -84,8 +84,8 @@ class CostService:
     async def calculate_extra_cost(
         self,
         is_priority: bool,
-        from_location: QuoteLocationRequest,
-        to_location: QuoteLocationRequest,
+        from_location: QuoteLocationSchema,
+        to_location: QuoteLocationSchema,
         base_cost: BaseCost,
     ) -> ExtraCost:
         builder = ExtraCostBuilder(base_cost=base_cost)

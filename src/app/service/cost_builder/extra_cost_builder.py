@@ -3,7 +3,7 @@ from decimal import Decimal
 
 from app.core.utils import round_up_decimal
 from app.schema.cost import BaseCost, ExtraCost
-from app.schema.quote import QuoteLocationRequest
+from app.schema.quote import QuoteLocationSchema
 
 
 class ExtraCostBuilder:
@@ -12,7 +12,7 @@ class ExtraCostBuilder:
         self._final_cost = Decimal(0)
 
     def calculate_accesserial(
-        self, location: QuoteLocationRequest
+        self, location: QuoteLocationSchema
     ) -> "ExtraCostBuilder":
         if len(location.accessorials) > 0:
             for accessory in location.accessorials:
@@ -34,7 +34,7 @@ class ExtraCostBuilder:
         return Decimal(25)
 
     def calculate_service_extra_cost(
-        self, is_priority: bool, location: QuoteLocationRequest
+        self, is_priority: bool, location: QuoteLocationSchema
     ) -> "ExtraCostBuilder":
 
         self._final_cost += self._check_weekend_cost(location.request_datetime)

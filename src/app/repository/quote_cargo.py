@@ -29,6 +29,12 @@ class QuoteCargoRepository:
         await self.db_session.flush()
         return quote_cargos
 
+    async def get_quote_cargo(self, quote_id: str) -> List[QuoteCargo]:
+        result = await self.db_session.execute(
+            select(QuoteCargo).where(QuoteCargo.quote_id == quote_id)
+        )
+        return result.scalars().all()
+
     async def delete_quote_cargo(self, quote_id: str):
         """견적 ID에 해당하는 모든 화물 정보를 삭제합니다."""
         await self.db_session.execute(

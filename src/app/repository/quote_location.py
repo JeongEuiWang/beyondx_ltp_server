@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update
-from typing import Optional
+from typing import List, Optional
 
 from app.model.quote import QuoteLocation
 from app.model._enum import ShipmentTypeEnum
@@ -9,6 +9,12 @@ from app.model._enum import ShipmentTypeEnum
 class QuoteLocationRepository:
     def __init__(self, db_session: AsyncSession):
         self.db_session = db_session
+    
+    async def get_quote_locations_by_quote_id(self, quote_id: str) -> List[QuoteLocation]:
+        result = await self.db_session.execute(
+            select(QuoteLocation).where(QuoteLocation.quote_id == quote_id)
+        )
+        return result.scalars().all()
 
     async def get_quote_location_by_shipment_type(
         self, quote_id: str, shipment_type: ShipmentTypeEnum

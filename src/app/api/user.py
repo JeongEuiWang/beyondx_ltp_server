@@ -3,19 +3,17 @@ from pydantic import EmailStr
 from typing import List
 
 from app.core.auth import requiredAuthDeps
-
+from app.core.exceptions import ValidationException
 from ..schema.user import (
     CreateUserRequest,
     CreateUserResponse,
     CheckEmailResponse,
     GetUserInfoResponse,
-)
-
-from ..schema.user_address import (
     CreateUserAddressRequest,
     CreateUserAddressResponse,
-    UserAddressResponse,
+    GetUserAddressResponse,
 )
+
 from ..service._deps import (
     userServiceDeps,
 )
@@ -32,8 +30,9 @@ async def check_email(
 ):
     result = await user_service.check_email(email)
     if not result.is_unique:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail={"is_unique": False}
+        raise ValidationException(
+            message="이미 사용 중인 이메일입니다",
+            details={"is_unique": False}
         )
     return result
 
@@ -63,7 +62,7 @@ async def create_user_address(
 
 @router.get(
     "/address",
-    response_model=List[UserAddressResponse],
+    response_model=List[GetUserAddressResponse],
     status_code=status.HTTP_200_OK,
 )
 async def get_user_address(user_service: userServiceDeps, token_data: requiredAuthDeps):

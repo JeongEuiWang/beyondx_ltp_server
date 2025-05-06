@@ -1,7 +1,7 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from contextlib import asynccontextmanager
 import logging
-
+from .core.exception_handlers import setup_exception_handlers
 from .api._router import router as api_router
 
 logger = logging.getLogger(__name__)
@@ -25,3 +25,4 @@ app = FastAPI(
 
 # API 라우터 등록
 app.include_router(api_router, prefix="/api")
+setup_exception_handlers(app)  # 여기에 추가

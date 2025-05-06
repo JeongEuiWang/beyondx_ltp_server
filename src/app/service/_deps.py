@@ -10,6 +10,7 @@ from app.repository._deps import (
     userLevelRepositoryDeps,
     quoteRepositoryDeps,
     quoteLocationRepositoryDeps,
+    quoteLocationAccessorialRepositoryDeps,
     quoteCargoRepositoryDeps,
 )
 from app.service.rate import RateService
@@ -49,11 +50,15 @@ async def get_cargo_service(cargo_repository: cargoRepositoryDeps) -> CargoServi
 async def get_quote_service(
     quote_repository: quoteRepositoryDeps,
     quote_location_repository: quoteLocationRepositoryDeps,
+    quote_location_accessorial_repository: quoteLocationAccessorialRepositoryDeps,
     quote_cargo_repository: quoteCargoRepositoryDeps,
     session: sessionDeps,
 ) -> QuoteService:
     service = QuoteService(
-        quote_repository, quote_location_repository, quote_cargo_repository
+        quote_repository, 
+        quote_location_repository, 
+        quote_location_accessorial_repository,
+        quote_cargo_repository
     )
     service.db = session  # DB 세션 설정
     return service

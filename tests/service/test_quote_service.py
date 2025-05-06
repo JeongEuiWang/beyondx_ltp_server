@@ -3,21 +3,26 @@ Quote 서비스 테스트
 """
 
 import pytest
-import datetime
 from decimal import Decimal
 from sqlalchemy.ext.asyncio import AsyncSession
+from unittest.mock import AsyncMock, MagicMock, patch
+from datetime import datetime, timedelta  # timedelta도 import
 
 from app.service.quote import QuoteService
 from app.service.cost import CostService
 from app.repository.quote import QuoteRepository
 from app.repository.quote_location import QuoteLocationRepository
+from app.repository.quote_location_accessorial import QuoteLocationAccessorialRepository
 from app.repository.quote_cargo import QuoteCargoRepository
 from app.repository.rate import RateRepository
+from app.repository.user import UserRepository
+from app.repository.user_level import UserLevelRepository
 from app.schema.quote import (
     CreateQuoteRequest,
     QuoteLocationRequest,
     QuoteCargoRequest,
     QuoteLocationAccessorialRequest,
+    UpdateQuoteRequest,
 )
 from app.schema.cost import BaseCost, LocationCost, ExtraCost
 from app.model._enum import LocationTypeEnum, ShipmentTypeEnum
@@ -32,20 +37,24 @@ class TestQuoteService:
         # 리포지토리 인스턴스 생성
         quote_repository = QuoteRepository(db_session)
         quote_location_repository = QuoteLocationRepository(db_session)
+        quote_location_accessorial_repository = QuoteLocationAccessorialRepository(db_session)
         quote_cargo_repository = QuoteCargoRepository(db_session)
         rate_repository = RateRepository(db_session)
+        user_repository = UserRepository(db_session)
+        user_level_repository = UserLevelRepository(db_session)
 
         # 서비스 인스턴스 생성
         quote_service = QuoteService(
             quote_repository,
             quote_location_repository,
+            quote_location_accessorial_repository,
             quote_cargo_repository
         )
         
         # @transactional 데코레이터를 위한 db 속성 설정
         quote_service.db = db_session
         
-        cost_service = CostService(rate_repository)
+        cost_service = CostService(rate_repository, user_repository, user_level_repository)
 
         # 테스트용 견적 요청 데이터 생성
         # 실제 DB에서 확인한 ID 값 사용
@@ -59,7 +68,7 @@ class TestQuoteService:
                 zip_code="10001",  # 테스트용 ZIP 코드
                 address="123 메인 스트리트",
                 location_type=LocationTypeEnum.COMMERCIAL,
-                request_datetime=datetime.datetime.now(),
+                request_datetime=datetime.now(),
                 accessorials=[
                     QuoteLocationAccessorialRequest(
                         cargo_accessorial_id=1,  # Inside Delivery (확인됨)
@@ -74,7 +83,7 @@ class TestQuoteService:
                 zip_code="90001",  # 테스트용 ZIP 코드
                 address="456 새턴 애비뉴",
                 location_type=LocationTypeEnum.RESIDENTIAL,
-                request_datetime=datetime.datetime.now() + datetime.timedelta(days=3),
+                request_datetime=datetime.now() + timedelta(days=3),
                 accessorials=[
                     QuoteLocationAccessorialRequest(
                         cargo_accessorial_id=3,  # Lift Gate (확인됨)
@@ -118,9 +127,10 @@ class TestQuoteService:
         new_quote = await quote_service.create_quote(
             user_id=1,  # 테스트용 사용자 ID
             quote=quote_request,
-            base_cost=mock_base_cost,
-            location_type_cost=mock_location_cost,
-            extra_cost=mock_extra_cost
+            total_weight=mock_base_cost.freight_weight,
+            base_price=mock_base_cost.cost,
+            extra_price=mock_location_cost.cost + mock_extra_cost.cost,
+            total_price_with_discount=mock_base_cost.cost + mock_location_cost.cost + mock_extra_cost.cost
         )
 
         # 검증
@@ -132,9 +142,243 @@ class TestQuoteService:
         assert new_quote.total_weight == mock_base_cost.freight_weight
         assert new_quote.total_price == mock_base_cost.cost + mock_location_cost.cost + mock_extra_cost.cost
 
-        # 데이터베이스에서 생성된 견적 정보 확인
-        # 추가 검증을 위해 필요하다면 다음 쿼리를 수행할 수 있습니다
-        # statement = select(Quote).where(Quote.id == new_quote.id)
-        # result = await db_session.execute(statement)
-        # fetched_quote = result.scalar_one_or_none()
-        # assert fetched_quote is not None 
+
+@pytest.fixture
+def mock_repositories():
+    """테스트에 필요한 레포지토리 목 객체를 생성합니다."""
+    quote_repository = AsyncMock()
+    quote_location_repository = AsyncMock()
+    quote_location_accessorial_repository = AsyncMock()
+    quote_cargo_repository = AsyncMock()
+    
+    return {
+        'quote_repository': quote_repository,
+        'quote_location_repository': quote_location_repository,
+        'quote_location_accessorial_repository': quote_location_accessorial_repository,
+        'quote_cargo_repository': quote_cargo_repository
+    }
+
+
+@pytest.fixture
+def quote_service(mock_repositories):
+    """테스트용 QuoteService 인스턴스를 생성합니다."""
+    service = QuoteService(
+        quote_repository=mock_repositories['quote_repository'],
+        quote_location_repository=mock_repositories['quote_location_repository'],
+        quote_location_accessorial_repository=mock_repositories['quote_location_accessorial_repository'],
+        quote_cargo_repository=mock_repositories['quote_cargo_repository']
+    )
+    # transactional 데코레이터를 위한 Mock DB 세션
+    service.db = AsyncMock()
+    return service
+
+
+@pytest.fixture
+def update_quote_request():
+    """견적 업데이트 요청 객체를 생성합니다."""
+    return UpdateQuoteRequest(
+        cargo_transportation_id=1,
+        is_priority=True,
+        from_location=QuoteLocationRequest(
+            state="경기도",
+            county="성남시",
+            city="분당구",
+            zip_code="13561",
+            address="판교로 228번길",
+            location_type=LocationTypeEnum.COMMERCIAL,
+            request_datetime=datetime.now(),
+            accessorials=[
+                QuoteLocationAccessorialRequest(
+                    cargo_accessorial_id=1,
+                    name="리프트 게이트"
+                ),
+                QuoteLocationAccessorialRequest(
+                    cargo_accessorial_id=3,
+                    name="신규 서비스"
+                )
+            ]
+        ),
+        to_location=QuoteLocationRequest(
+            state="서울",
+            county="강남구",
+            city="역삼동",
+            zip_code="06142",
+            address="테헤란로 521",
+            location_type=LocationTypeEnum.COMMERCIAL,
+            request_datetime=datetime.now(),
+            accessorials=[
+                QuoteLocationAccessorialRequest(
+                    cargo_accessorial_id=2,
+                    name="하역 서비스"
+                )
+            ]
+        ),
+        cargo=[
+            QuoteCargoRequest(
+                width=100,
+                length=100,
+                height=100,
+                weight=100,
+                quantity=1,
+                package_description="테스트 화물",
+                cargo_stackable=True,
+                cargo_temperature="상온",
+                is_hazardous=False,
+                hazardous_detail=""
+            )
+        ]
+    )
+
+
+@pytest.mark.asyncio
+async def test_update_quote(quote_service, mock_repositories, update_quote_request):
+    """견적 업데이트 기능을 테스트합니다."""
+    quote_id = "TEST_QUOTE_ID"
+    user_id = 1
+    
+    # 견적 목 객체 설정
+    updated_quote = MagicMock()
+    mock_repositories['quote_repository'].update_quote.return_value = updated_quote
+    
+    # 위치 목 객체 설정
+    from_location = MagicMock()
+    from_location.id = 1
+    to_location = MagicMock()
+    to_location.id = 2
+    
+    mock_repositories['quote_location_repository'].get_quote_location_by_shipment_type.side_effect = [
+        from_location,  # PICKUP 타입 호출 시
+        to_location     # DELIVERY 타입 호출 시
+    ]
+    
+    # 현재 부가 서비스 목 객체 설정 - from_location
+    from_accessorials = [
+        MagicMock(cargo_accessorial_id=1),  # 유지될 부가 서비스
+        MagicMock(cargo_accessorial_id=2)   # 삭제될 부가 서비스
+    ]
+    
+    # 현재 부가 서비스 목 객체 설정 - to_location
+    to_accessorials = [
+        MagicMock(cargo_accessorial_id=2)   # 유지될 부가 서비스
+    ]
+    
+    mock_repositories['quote_location_accessorial_repository'].get_quote_location_accessorials.side_effect = [
+        from_accessorials,
+        to_accessorials
+    ]
+    
+    # 함수 실행
+    result = await quote_service.update_quote(
+        quote_id=quote_id,
+        user_id=user_id,
+        quote=update_quote_request,
+        total_weight=Decimal('100'),
+        base_price=Decimal('1000'),
+        extra_price=Decimal('500'),
+        total_price_with_discount=Decimal('1500')
+    )
+    
+    # 견적 업데이트 검증
+    mock_repositories['quote_repository'].update_quote.assert_called_once_with(
+        quote_id=quote_id,
+        user_id=user_id,
+        is_priority=update_quote_request.is_priority,
+        cargo_transportation_id=update_quote_request.cargo_transportation_id,
+        total_weight=Decimal('100'),
+        base_price=Decimal('1000'),
+        extra_price=Decimal('500'),
+        total_price_with_discount=Decimal('1500')
+    )
+    
+    # 위치 정보 조회 검증
+    mock_repositories['quote_location_repository'].get_quote_location_by_shipment_type.assert_any_call(
+        quote_id, ShipmentTypeEnum.PICKUP
+    )
+    mock_repositories['quote_location_repository'].get_quote_location_by_shipment_type.assert_any_call(
+        quote_id, ShipmentTypeEnum.DELIVERY
+    )
+    
+    # 위치 정보 업데이트 검증
+    mock_repositories['quote_location_repository'].update_quote_location.assert_any_call(
+        from_location.id, update_quote_request.from_location
+    )
+    mock_repositories['quote_location_repository'].update_quote_location.assert_any_call(
+        to_location.id, update_quote_request.to_location
+    )
+    
+    # 부가 서비스 삭제 및 추가 검증
+    mock_repositories['quote_location_accessorial_repository'].delete_specific_accessorials.assert_any_call(
+        from_location.id, [2]  # from_location에서 cargo_accessorial_id=2 삭제
+    )
+    
+    # cargo 정보 업데이트 검증
+    mock_repositories['quote_cargo_repository'].delete_quote_cargo.assert_called_once_with(quote_id)
+    mock_repositories['quote_cargo_repository'].create_quote_cargo.assert_called_once_with(
+        quote_id, update_quote_request.cargo
+    )
+    
+    # 결과 검증
+    assert result == updated_quote
+
+
+@pytest.mark.asyncio
+async def test_update_accessorials_add_new(quote_service, mock_repositories):
+    """부가 서비스 추가 로직을 테스트합니다."""
+    location_id = 1
+    
+    # 현재 부가 서비스 설정
+    current_accessorials = [
+        MagicMock(cargo_accessorial_id=1),
+        MagicMock(cargo_accessorial_id=2)
+    ]
+    
+    # 새로운 부가 서비스 설정
+    new_accessorials = [
+        QuoteLocationAccessorialRequest(cargo_accessorial_id=1, name="기존 서비스"),
+        QuoteLocationAccessorialRequest(cargo_accessorial_id=3, name="새 서비스")
+    ]
+    
+    mock_repositories['quote_location_accessorial_repository'].get_quote_location_accessorials.return_value = current_accessorials
+    
+    # 함수 실행
+    await quote_service._update_accessorials(location_id, new_accessorials)
+    
+    # 검증
+    mock_repositories['quote_location_accessorial_repository'].delete_specific_accessorials.assert_called_once_with(
+        location_id, [2]  # cargo_accessorial_id=2 삭제
+    )
+    
+    # 새 서비스 추가 검증
+    mock_repositories['quote_location_accessorial_repository'].create_quote_location_accessorial.assert_called_once()
+    called_location_id, called_accessorials = mock_repositories['quote_location_accessorial_repository'].create_quote_location_accessorial.call_args[0]
+    assert called_location_id == location_id
+    assert len(called_accessorials) == 1
+    assert called_accessorials[0].cargo_accessorial_id == 3
+
+
+@pytest.mark.asyncio
+async def test_update_accessorials_remove_all(quote_service, mock_repositories):
+    """모든 부가 서비스 삭제 로직을 테스트합니다."""
+    location_id = 1
+    
+    # 현재 부가 서비스 설정
+    current_accessorials = [
+        MagicMock(cargo_accessorial_id=1),
+        MagicMock(cargo_accessorial_id=2)
+    ]
+    
+    # 빈 부가 서비스 설정
+    new_accessorials = []
+    
+    mock_repositories['quote_location_accessorial_repository'].get_quote_location_accessorials.return_value = current_accessorials
+    
+    # 함수 실행
+    await quote_service._update_accessorials(location_id, new_accessorials)
+    
+    # 검증
+    mock_repositories['quote_location_accessorial_repository'].delete_specific_accessorials.assert_called_once_with(
+        location_id, [1, 2]  # 모든 부가 서비스 삭제
+    )
+    
+    # 추가된 서비스 없음 검증
+    mock_repositories['quote_location_accessorial_repository'].create_quote_location_accessorial.assert_not_called()

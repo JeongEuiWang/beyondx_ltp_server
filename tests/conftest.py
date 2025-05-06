@@ -101,6 +101,8 @@ async def db_session(setup_database) -> AsyncGenerator[AsyncSession, None]:
 @pytest.fixture
 async def client(db_session) -> AsyncGenerator[AsyncClient, None]:
     """테스트 클라이언트"""
+    from app.main import app
+    from app.core.auth import get_current_user, TokenData
 
     # DB 세션 의존성 오버라이드
     async def override_get_async_session() -> AsyncGenerator[AsyncSession, None]:
@@ -113,8 +115,8 @@ async def client(db_session) -> AsyncGenerator[AsyncClient, None]:
     # 의존성 오버라이드 설정
     app.dependency_overrides[get_async_session] = override_get_async_session
     
-    # 인증 의존성은 테스트에서 개별적으로 처리하도록 함
-    # app.dependency_overrides[get_current_user] = override_auth
+    # 인증 의존성 설정 (주석 해제)
+    app.dependency_overrides[get_current_user] = override_auth
 
     # ASGITransport 사용하여 AsyncClient 생성
     transport = ASGITransport(app=app)
@@ -132,6 +134,7 @@ async def client(db_session) -> AsyncGenerator[AsyncClient, None]:
 @pytest.fixture
 def sync_client(db_session) -> Generator[TestClient, None, None]:
     """동기식 테스트 클라이언트 (일부 테스트에 필요할 수 있음)"""
+    from app.main import app
 
     # DB 세션 의존성 오버라이드
     async def override_get_async_session() -> AsyncGenerator[AsyncSession, None]:

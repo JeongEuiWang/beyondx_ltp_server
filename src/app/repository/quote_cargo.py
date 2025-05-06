@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, delete
 from typing import List, Optional
 
 from app.model.quote import QuoteCargo
@@ -9,7 +9,7 @@ class QuoteCargoRepository:
     def __init__(self, db_session: AsyncSession):
         self.db_session = db_session
 
-    async def create_quote_cargo(self, quote_id: int, quote_cargo: List[QuoteCargo] ):
+    async def create_quote_cargo(self, quote_id: int, quote_cargo: List[QuoteCargo]):
         quote_cargos = [
             QuoteCargo(
                 quote_id=quote_id,
@@ -28,3 +28,10 @@ class QuoteCargoRepository:
         self.db_session.add_all(quote_cargos)
         await self.db_session.flush()
         return quote_cargos
+
+    async def delete_quote_cargo(self, quote_id: str):
+        """견적 ID에 해당하는 모든 화물 정보를 삭제합니다."""
+        await self.db_session.execute(
+            delete(QuoteCargo).where(QuoteCargo.quote_id == quote_id)
+        )
+        await self.db_session.flush()

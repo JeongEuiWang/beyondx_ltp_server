@@ -7,6 +7,7 @@ from ..repository.cargo import CargoRepository
 from ..repository.user_level import UserLevelRepository
 from ..repository.quote import QuoteRepository
 from ..repository.quote_location import QuoteLocationRepository
+from ..repository.quote_location_accessorial import QuoteLocationAccessorialRepository
 from ..repository.quote_cargo import QuoteCargoRepository
 from typing import Annotated
 
@@ -40,6 +41,10 @@ def get_quote_location_repository(session: sessionDeps) -> QuoteLocationReposito
     return QuoteLocationRepository(db_session=session)
 
 
+def get_quote_location_accessorial_repository(session: sessionDeps) -> QuoteLocationAccessorialRepository:
+    return QuoteLocationAccessorialRepository(db_session=session)
+
+
 def get_quote_cargo_repository(session: sessionDeps) -> QuoteCargoRepository:
     return QuoteCargoRepository(db_session=session)
   
@@ -53,4 +58,5 @@ cargoRepositoryDeps = Annotated[CargoRepository, Depends(get_cargo_repository)]
 userLevelRepositoryDeps = Annotated[UserLevelRepository, Depends(get_user_level_repository)]
 quoteRepositoryDeps = Annotated[QuoteRepository, Depends(get_quote_repository)]
 quoteLocationRepositoryDeps = Annotated[QuoteLocationRepository, Depends(get_quote_location_repository)]
+quoteLocationAccessorialRepositoryDeps = Annotated[QuoteLocationAccessorialRepository, Depends(get_quote_location_accessorial_repository)]
 quoteCargoRepositoryDeps = Annotated[QuoteCargoRepository, Depends(get_quote_cargo_repository)]

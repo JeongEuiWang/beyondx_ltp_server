@@ -190,6 +190,8 @@ def upgrade() -> None:
         sa.Column("cargo_transportation_id", sa.Integer(), nullable=False),
         sa.Column("is_priority", sa.Boolean(), nullable=False),
         sa.Column("total_weight", sa.Numeric(precision=16, scale=4), nullable=False),
+        sa.Column("base_price", sa.Numeric(precision=16, scale=4), nullable=False),
+        sa.Column("extra_price", sa.Numeric(precision=16, scale=4), nullable=False),
         sa.Column("total_price", sa.Numeric(precision=16, scale=4), nullable=False),
         sa.Column(
             "order_status",

@@ -1,6 +1,66 @@
 # 테스트 가이드
 
-## 테스트 구조
+## 테스트 구조 및 실행 방법
+
+### 테스트 구조
+
+테스트는 다음과 같은 구조로 구성되어 있습니다:
+
+- `tests/api/`: API 엔드포인트 테스트
+- `tests/service/`: 서비스 로직 테스트
+- `conftest.py`: 공통 테스트 픽스처
+
+### 테스트 실행 방법
+
+전체 테스트 실행:
+```bash
+pytest
+```
+
+특정 모듈 테스트:
+```bash
+pytest tests/api/test_quote_api.py
+```
+
+특정 테스트 실행:
+```bash
+pytest tests/service/test_quote_service.py::test_update_quote
+```
+
+### quote 관련 테스트
+
+#### API 테스트
+
+`tests/api/test_quote_api.py`에는 다음 테스트가 포함되어 있습니다:
+
+- `test_update_quote_success`: 견적 업데이트 성공 테스트
+- `test_update_quote_not_found`: 존재하지 않는 견적 조회 시 404 오류 테스트
+- `test_update_quote_max_load_exceeded`: 최대 금액 초과 시 400 오류 테스트
+
+#### 서비스 테스트
+
+`tests/service/test_quote_service.py`에는 다음 테스트가 포함되어 있습니다:
+
+- `test_create_quote`: 견적 생성 테스트
+- `test_update_quote`: 견적 업데이트 테스트
+- `test_update_accessorials_add_new`: 부가 서비스 추가 테스트
+- `test_update_accessorials_remove_all`: 모든 부가 서비스 삭제 테스트
+
+### 테스트 작성 가이드
+
+1. API 테스트 작성 시 고려 사항:
+   - 엔드포인트 응답 상태 코드 확인
+   - 예외 처리 확인
+   - 의존성 주입된 서비스의 호출 확인
+
+2. 서비스 테스트 작성 시 고려 사항:
+   - 서비스 로직 정확성 확인
+   - 데이터베이스 업데이트 확인
+   - 관련 레포지토리 메서드 호출 확인
+
+3. 목(Mock) 객체 활용:
+   - 데이터베이스 접근 최소화
+   - 서비스 간 의존성 격리
 
 ```
 tests/

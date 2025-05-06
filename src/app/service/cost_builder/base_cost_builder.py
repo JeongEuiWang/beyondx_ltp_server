@@ -5,6 +5,7 @@ from decimal import Decimal
 from app.core.utils import round_up_decimal
 from app.schema.cost import BaseCost, RateCost
 
+
 class BaseCostBuilder:
     def __init__(self, fsc: Decimal):
         self._freight_weight = Decimal(
@@ -49,6 +50,10 @@ class BaseCostBuilder:
         return self
 
     def set_price_per_weight(self, rate_costs: List[RateCost]) -> "BaseCostBuilder":
+        if self._freight_weight > self._max_load_weight:
+            raise Exception(
+                "최대 운임 무게를 초과했습니다. 고객사에 직접 문의해주세요."
+            )
         for rate_cost in rate_costs:
             if (
                 self._freight_weight >= rate_cost.min_weight
@@ -74,4 +79,8 @@ class BaseCostBuilder:
         return self
 
     def calculate(self) -> BaseCost:
-        return BaseCost(cost=self._final_cost, freight_weight=self._freight_weight, is_max_load=self._is_max_load)
+        return BaseCost(
+            cost=self._final_cost,
+            freight_weight=self._freight_weight,
+            is_max_load=self._is_max_load,
+        )

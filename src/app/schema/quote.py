@@ -1,5 +1,5 @@
 import datetime
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel
 from app.model._enum import LocationTypeEnum
 
@@ -39,7 +39,10 @@ class QuoteCargoRequest(BaseModel):
 class CreateQuoteRequest(BaseQuoteRequest):
     from_location: QuoteLocationRequest
     to_location: QuoteLocationRequest
-    cargo: List[QuoteCargoRequest]
+    cargo: List[QuoteCargoRequest]  
+    
 
-    class Config:
-        from_attributes = True
+class UpdateQuoteRequest(BaseQuoteRequest):
+    from_location: QuoteLocationRequest
+    to_location: QuoteLocationRequest
+    cargo: List[QuoteCargoRequest]

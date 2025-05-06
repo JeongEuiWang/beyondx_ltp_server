@@ -5,6 +5,7 @@ Cost Builder 테스트
 import pytest
 import datetime
 from decimal import Decimal
+from unittest.mock import MagicMock
 
 from app.service.cost_builder.base_cost_builder import BaseCostBuilder
 from app.service.cost_builder.location_type_cost_builder import LocationCostBuilder
@@ -39,6 +40,8 @@ class TestBaseCostBuilder:
         """가격/무게 비율 계산 테스트"""
         builder = BaseCostBuilder(fsc=Decimal("0.35"))
         builder._freight_weight = Decimal("100")
+        # _max_load_weight 값을 설정하여 예외가 발생하지 않도록 함
+        builder._max_load_weight = Decimal("200")
         
         # 테스트 요율 설정
         rate_costs = [
@@ -53,10 +56,30 @@ class TestBaseCostBuilder:
         
         # 무게가 요율 범위에 없는 경우
         builder._freight_weight = Decimal("1000")
+        # 최대 무게도 그에 맞게 증가시킴
+        builder._max_load_weight = Decimal("1500")
         builder.set_price_per_weight(rate_costs)
         # 조건에 맞는 rate_cost가 없으면 price_per_weight는 변경되지 않음
         assert builder._price_per_weight == Decimal("4")
+    
+    def test_set_price_per_weight_exceeds_max_weight(self):
+        # Given
+        builder = BaseCostBuilder(fsc=Decimal("0.35"))
         
+        # 최대 무게를 초과하는 상황 설정
+        builder._freight_weight = Decimal("1000")
+        builder._max_load_weight = Decimal("500")
+        
+        rate_costs = [
+            RateCost(min_weight=Decimal("0"), max_weight=Decimal("1000"), price_per_weight=Decimal("10"))
+        ]
+        
+        # When/Then
+        with pytest.raises(Exception) as excinfo:
+            builder.set_price_per_weight(rate_costs)
+        
+        assert "최대 운임 무게를 초과했습니다" in str(excinfo.value)
+    
     def test_calculate_base_cost(self):
         """기본 비용 계산 테스트"""
         builder = BaseCostBuilder(fsc=Decimal("0.35"))

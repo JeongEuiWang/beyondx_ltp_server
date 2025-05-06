@@ -26,8 +26,9 @@ class Quote(TimestampMixin, Base):
     is_priority = Column(Boolean, nullable=False, default=False)
 
     total_weight = Column(Numeric(16, 4), nullable=False)
-    total_price = Column(Numeric(16, 4), nullable=False)
-
+    base_price = Column(Numeric(16, 4), nullable=False)
+    extra_price = Column(Numeric(16, 4), nullable=False) # location_type_cost + extra_cost
+    total_price = Column(Numeric(16, 4), nullable=False) # total_price_with_discount
     order_status = Column(
         Enum(OrderStatusEnum), nullable=False, default=OrderStatusEnum.ESTIMATE
     )

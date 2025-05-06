@@ -2,6 +2,7 @@ from decimal import Decimal
 
 from app.model.user import UserLevel
 from app.schema.cost import DiscountCost
+from app.core.utils import round_up_decimal
 
 class DiscountBuilder:
     def __init__(self, total_cost: Decimal):
@@ -18,4 +19,4 @@ class DiscountBuilder:
         return self._total_cost * discount_rate
     
     def calculate(self) -> DiscountCost:
-        return DiscountCost(cost=self._total_cost)
+        return DiscountCost(cost=round_up_decimal(self._total_cost))

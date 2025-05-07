@@ -1,7 +1,8 @@
 from fastapi import APIRouter, status
 from typing import List
-from ..service._deps import cargoServiceDeps
 from ..schema.cargo import CargoTransportationResponse, CargoAccessorialResponse
+from ..core.dependencies import container
+from ..service import CargoService
 
 router = APIRouter(prefix="/cargo", tags=["cargo"])
 
@@ -12,7 +13,7 @@ router = APIRouter(prefix="/cargo", tags=["cargo"])
     status_code=status.HTTP_200_OK,
 )
 async def get_cargo_transportation(
-    cargo_service: cargoServiceDeps,
+    cargo_service: CargoService = container.get("cargo_service"),
 ):
     return await cargo_service.get_cargo_transportation()
 
@@ -23,6 +24,6 @@ async def get_cargo_transportation(
     status_code=status.HTTP_200_OK,
 )
 async def get_cargo_accessorial(
-    cargo_service: cargoServiceDeps,
+    cargo_service: CargoService = container.get("cargo_service"),
 ):
     return await cargo_service.get_cargo_accessorial()

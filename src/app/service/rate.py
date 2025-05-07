@@ -1,4 +1,3 @@
-from fastapi import HTTPException
 from typing import Optional
 from ..schema.rate import RateLocationResponse
 from ..repository.rate_location import RateLocationRepository

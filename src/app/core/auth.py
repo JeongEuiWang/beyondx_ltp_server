@@ -1,7 +1,9 @@
-from fastapi import Depends, HTTPException, status, Cookie
+from fastapi import Depends, Cookie
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError
-from typing import Annotated, Optional
+from typing import Optional
+
+from ..core.exceptions import AuthException
 from .jwt import decode_token
 
 # 토큰 URL 설정 (로그인 엔드포인트)
@@ -25,10 +27,8 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> TokenData:
     """
     현재 요청의 토큰을 검증하고 유저 정보를 반환합니다.
     """
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Invalid authentication credentials",
-        headers={"WWW-Authenticate": "Bearer"},
+    credentials_exception = AuthException(
+        message="유효하지 않은 인증 정보입니다.",
     )
 
     try:
@@ -60,6 +60,3 @@ async def required_authorization(
     token_data: TokenData = Depends(get_current_user),
 ) -> TokenData:
     return token_data
-
-requiredAuthDeps = Annotated[TokenData, Depends(required_authorization)]
-cookieAuthDeps = Annotated[Optional[str], Depends(get_refresh_token_from_cookie)]

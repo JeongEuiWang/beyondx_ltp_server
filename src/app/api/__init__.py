@@ -1,3 +1,15 @@
-"""
-API 라우터 초기화 파일
-""" 
+from fastapi import APIRouter
+
+from .auth import router as auth_router
+from .user import router as user_router
+from .rate import router as rate_router
+from .cargo import router as cargo_router
+from .quote import router as quote_router
+
+router = APIRouter()
+
+router.include_router(auth_router)
+router.include_router(user_router)
+router.include_router(rate_router)
+router.include_router(cargo_router)
+router.include_router(quote_router)

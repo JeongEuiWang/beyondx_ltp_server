@@ -2,7 +2,9 @@ from fastapi import APIRouter, Query, status
 from pydantic import EmailStr
 from typing import List
 
-from ..core.auth import requiredAuthDeps
+from ..core.auth import TokenData
+from ..service import UserService
+from ..core.dependencies import container
 from ..core.exceptions import ValidationException
 from ..schema.user import (
     CreateUserRequest,
@@ -14,10 +16,6 @@ from ..schema.user import (
     GetUserAddressResponse,
 )
 
-from ..service._deps import (
-    userServiceDeps,
-)
-
 router = APIRouter(prefix="/user", tags=["user"])
 
 
@@ -25,7 +23,7 @@ router = APIRouter(prefix="/user", tags=["user"])
     "/check-email", response_model=CheckEmailResponse, status_code=status.HTTP_200_OK
 )
 async def check_email(
-    user_service: userServiceDeps,
+    user_service: UserService = container.get("user_service"),
     email: EmailStr = Query(..., description="이메일"),
 ):
     result = await user_service.check_email(email)
@@ -39,12 +37,18 @@ async def check_email(
 @router.post(
     "/sign-up", response_model=CreateUserResponse, status_code=status.HTTP_200_OK
 )
-async def sign_up(user_data: CreateUserRequest, user_service: userServiceDeps):
+async def sign_up(
+    user_data: CreateUserRequest,
+    user_service: UserService = container.get("user_service"),
+):
     return await user_service.create_user(user_data)
 
 
 @router.get("/me", response_model=GetUserInfoResponse, status_code=status.HTTP_200_OK)
-async def get_user_info(user_service: userServiceDeps, token_data: requiredAuthDeps):
+async def get_user_info(
+    user_service: UserService = container.get("user_service"),
+    token_data: TokenData = container.get("required_authorization"),
+):
     return await user_service.get_user_info(token_data.user_id)
 
 
@@ -53,8 +57,8 @@ async def get_user_info(user_service: userServiceDeps, token_data: requiredAuthD
 )
 async def create_user_address(
     address_data: CreateUserAddressRequest,
-    user_service: userServiceDeps,
-    token_data: requiredAuthDeps,
+    user_service: UserService = container.get("user_service"),
+    token_data: TokenData = container.get("required_authorization"),
 ):
     return await user_service.create_user_address(token_data.user_id, address_data)
 
@@ -64,5 +68,8 @@ async def create_user_address(
     response_model=List[GetUserAddressResponse],
     status_code=status.HTTP_200_OK,
 )
-async def get_user_address(user_service: userServiceDeps, token_data: requiredAuthDeps):
+async def get_user_address(
+    user_service: UserService = container.get("user_service"),
+    token_data: TokenData = container.get("required_authorization"),
+):
     return await user_service.get_user_addresses(token_data.user_id)

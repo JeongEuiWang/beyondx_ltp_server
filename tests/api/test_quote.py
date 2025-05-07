@@ -3,7 +3,6 @@ Quote API 테스트
 """
 
 import pytest
-import uuid
 from decimal import Decimal
 from fastapi import status, HTTPException
 from unittest.mock import AsyncMock, patch, MagicMock

@@ -1,11 +1,9 @@
-from fastapi import APIRouter, HTTPException, status, Path
+from fastapi import APIRouter, status, Path
 
 from ..core.exceptions import BadRequestException, NotFoundException
-from ..core.auth import requiredAuthDeps
-from ..service._deps import (
-    quoteServiceDeps,
-    costServiceDeps,
-)
+from ..core.dependencies import container
+from ..core.auth import TokenData
+from ..service import CostService, QuoteService
 from ..schema.quote import CreateQuoteRequest, UpdateQuoteRequest
 
 router = APIRouter(prefix="/quote", tags=["quote"])
@@ -17,10 +15,10 @@ router = APIRouter(prefix="/quote", tags=["quote"])
     response_model=None,
 )
 async def create_quote(
-    cost_service: costServiceDeps,
-    quote_service: quoteServiceDeps,
-    token_data: requiredAuthDeps,
     request: CreateQuoteRequest,
+    cost_service: CostService = container.get("cost_service"),
+    quote_service: QuoteService = container.get("quote_service"),
+    token_data: TokenData = container.get("required_authorization"),
 ):
     base_cost = await cost_service.calculate_base_cost(
         request.cargo, request.from_location, request.to_location
@@ -61,11 +59,11 @@ async def create_quote(
     response_model=None,
 )
 async def update_quote(
-    cost_service: costServiceDeps,
-    quote_service: quoteServiceDeps,
-    token_data: requiredAuthDeps,
     request: UpdateQuoteRequest,
     quote_id: str = Path(..., description="인용 ID"),
+    cost_service: CostService = container.get("cost_service"),
+    quote_service: QuoteService = container.get("quote_service"),
+    token_data: TokenData = container.get("required_authorization"),
 ):
     # 기존 견적 조회
     quote = await quote_service.get_quote_by_id(quote_id, token_data.user_id)
@@ -80,9 +78,8 @@ async def update_quote(
     )
 
     if base_cost.is_max_load:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="최대 금액을 초과했습니다. 고객사에 직접 문의해주세요.",
+        raise BadRequestException(
+            message="최대 금액을 초과했습니다. 고객사에 직접 문의해주세요.",
         )
 
     location_type_cost = await cost_service.calculate_location_type_cost(

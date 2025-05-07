@@ -71,14 +71,14 @@ class AuthService:
         return LoginResponse.model_validate(user_dict)
 
     async def refresh_token(
-        self, token_data: TokenData, response: Response
+        self, user_id: int, role_id: int, response: Response
     ) -> RefreshTokenResponse:
-        user = await self.user_repository.get_user_by_id(token_data.user_id)
+        user = await self.user_repository.get_user_by_id(user_id)
         if not user:
-            raise AuthException(message="사용자를 찾을 수 없습니다.")
+            raise NotFoundException(message="사용자를 찾을 수 없습니다.")
 
         # 새 토큰 생성
-        new_token_data = {"sub": str(user.id), "role_id": user.role_id}
+        new_token_data = {"sub": str(user_id), "role_id": role_id}
         access = create_access_token(data=new_token_data)
         refresh = create_refresh_token(data=new_token_data)
 

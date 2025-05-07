@@ -1,13 +1,11 @@
 from decimal import Decimal
-from typing import List, Dict, Set
-from fastapi import HTTPException, status
-from app.core.decorator import transactional
-from app.model._enum import ShipmentTypeEnum
+from typing import List
+from ..core.decorator import transactional
+from ..core.exceptions import NotFoundException
+from ..model._enum import ShipmentTypeEnum
+from ..schema._common import BaseQuoteSchema
 from ..schema.quote import (
     CreateQuoteRequest,
-    GetQuoteDetailsResponse,
-    QuoteLocationAccessorialSchema,
-    QuoteLocationSchema,
     UpdateQuoteRequest,
 )
 from ..repository.quote import QuoteRepository
@@ -32,9 +30,13 @@ class QuoteService:
         self.quote_cargo_repository = quote_cargo_repository
         self.db = None
 
-    async def get_quote_by_id(self, quote_id: str, user_id: int):
-        """견적 ID로 견적을 조회합니다."""
-        return await self.quote_repository.get_quote_by_id(quote_id, user_id)
+    async def get_quote_by_id(self, quote_id: str, user_id: int) -> BaseQuoteSchema:
+        result = await self.quote_repository.get_quote_by_id(quote_id, user_id)
+        if result is None:
+            raise NotFoundException(
+                message="견적을 찾을 수 없습니다.",
+            )
+        return BaseQuoteSchema.model_validate(result)
 
     @transactional()
     async def create_quote(
@@ -45,7 +47,7 @@ class QuoteService:
         base_price: Decimal,
         extra_price: Decimal,
         total_price_with_discount: Decimal,
-    ):
+    ) -> BaseQuoteSchema:
         new_quote = await self.quote_repository.create_quote(
             user_id=user_id,
             total_weight=total_weight,
@@ -68,7 +70,7 @@ class QuoteService:
         )
         await self.quote_cargo_repository.create_quote_cargo(new_quote.id, quote.cargo)
 
-        return new_quote
+        return BaseQuoteSchema.model_validate(new_quote)
 
     @transactional()
     async def update_quote(
@@ -80,9 +82,7 @@ class QuoteService:
         base_price: Decimal,
         extra_price: Decimal,
         total_price_with_discount: Decimal,
-    ):
-        """견적을 업데이트합니다."""
-        # 견적 기본 정보 업데이트 - 클라이언트에서 모든 정보를 전달하므로 그대로 업데이트
+    ) -> BaseQuoteSchema:
         updated_quote = await self.quote_repository.update_quote(
             quote_id=quote_id,
             user_id=user_id,
@@ -100,6 +100,10 @@ class QuoteService:
                 quote_id, ShipmentTypeEnum.PICKUP
             )
         )
+        if from_location is None:
+            raise NotFoundException(
+                message="출발지 정보를 찾을 수 없습니다.",
+            )
         await self.quote_location_repository.update_quote_location(
             from_location.id, quote.from_location
         )
@@ -114,6 +118,10 @@ class QuoteService:
                 quote_id, ShipmentTypeEnum.DELIVERY
             )
         )
+        if to_location is None:
+            raise NotFoundException(
+                message="도착지 정보를 찾을 수 없습니다.",
+            )
 
         await self.quote_location_repository.update_quote_location(
             to_location.id, quote.to_location
@@ -124,7 +132,7 @@ class QuoteService:
         await self.quote_cargo_repository.delete_quote_cargo(quote_id)
         await self.quote_cargo_repository.create_quote_cargo(quote_id, quote.cargo)
 
-        return updated_quote
+        return BaseQuoteSchema.model_validate(updated_quote)
 
     async def _update_accessorials(self, location_id: int, new_accessorials: List):
         current_accessorials = await self.quote_location_accessorial_repository.get_quote_location_accessorials(

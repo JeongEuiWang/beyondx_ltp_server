@@ -1,12 +1,11 @@
 from typing import List
-from fastapi import HTTPException
 
 from ..repository.user_address import UserAddressRepository
 from ..repository.user_level import UserLevelRepository
-from ..schema.user_address import (
+from ..schema.user import (
     CreateUserAddressRequest,
     CreateUserAddressResponse,
-    UserAddressResponse,
+    GetUserAddressResponse
 )
 from ..schema.user import (
     CreateUserRequest,
@@ -78,6 +77,6 @@ class UserService:
         )
         return CreateUserAddressResponse.model_validate(new_address)
 
-    async def get_user_addresses(self, user_id: int) -> List[UserAddressResponse]:
+    async def get_user_addresses(self, user_id: int) -> List[GetUserAddressResponse]:
         addresses = await self.user_address_repository.get_user_addresses_by_id(user_id)
-        return [UserAddressResponse.model_validate(addr) for addr in addresses]
+        return [GetUserAddressResponse.model_validate(addr) for addr in addresses]

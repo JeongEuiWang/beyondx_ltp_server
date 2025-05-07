@@ -9,7 +9,9 @@ class QuoteCargoRepository:
     def __init__(self, db_session: AsyncSession):
         self.db_session = db_session
 
-    async def create_quote_cargo(self, quote_id: int, quote_cargo: List[QuoteCargo]):
+    async def create_quote_cargo(
+        self, quote_id: int, quote_cargo: List[QuoteCargo]
+    ) -> List[QuoteCargo]:
         quote_cargos = [
             QuoteCargo(
                 quote_id=quote_id,

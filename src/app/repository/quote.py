@@ -11,7 +11,7 @@ class QuoteRepository:
     def __init__(self, db_session: AsyncSession):
         self.db_session = db_session
 
-    async def get_quote_by_id(self, quote_id: str, user_id: int) -> Optional[Quote]:
+    async def get_quote_by_id(self, quote_id: str, user_id: int) -> Quote | None:
         result = await self.db_session.execute(
             select(Quote).where(Quote.id == quote_id, Quote.user_id == user_id)
         )
@@ -52,7 +52,7 @@ class QuoteRepository:
         base_price: float,
         extra_price: float,
         total_price_with_discount: float,
-    ) -> Optional[Quote]:
+    ) -> Quote | None:
         """견적을 업데이트합니다."""
         # 업데이트할 값 준비 - 클라이언트에서 모든 정보를 전달하므로 모든 값 업데이트
         values = {

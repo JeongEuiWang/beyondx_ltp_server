@@ -1,9 +1,9 @@
-from fastapi import APIRouter, Query, HTTPException, status, Depends
+from fastapi import APIRouter, Query, status
 from pydantic import EmailStr
 from typing import List
 
-from app.core.auth import requiredAuthDeps
-from app.core.exceptions import ValidationException
+from ..core.auth import requiredAuthDeps
+from ..core.exceptions import ValidationException
 from ..schema.user import (
     CreateUserRequest,
     CreateUserResponse,
@@ -31,8 +31,7 @@ async def check_email(
     result = await user_service.check_email(email)
     if not result.is_unique:
         raise ValidationException(
-            message="이미 사용 중인 이메일입니다",
-            details={"is_unique": False}
+            message="이미 사용 중인 이메일입니다", details={"is_unique": False}
         )
     return result
 

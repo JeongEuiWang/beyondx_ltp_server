@@ -1,10 +1,10 @@
-from fastapi import APIRouter, HTTPException, status, Response
+from fastapi import APIRouter, Response
 
-from ..schema.auth import LoginRequest, LoginResponse, RefreshTokenResponse
 from ..service._deps import authServiceDeps
 from ..core.auth import TokenData, cookieAuthDeps
 from ..core.jwt import decode_token
-
+from ..core.exceptions import AuthException
+from ..schema.auth import LoginRequest, LoginResponse, RefreshTokenResponse
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -24,14 +24,8 @@ async def refresh(
     refresh_token: cookieAuthDeps,
     response: Response,
 ):
-    """
-    쿠키의 refresh token을 사용하여 새 토큰 발급
-    """
     if not refresh_token:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Refresh token not found in cookie",
-        )
+        raise AuthException(message="유효하지 않은 접근입니다.")
 
     try:
         payload = decode_token(refresh_token)
@@ -40,17 +34,14 @@ async def refresh(
 
         token_data = TokenData(user_id=user_id, role_id=role_id)
         return await auth_service.refresh_token(token_data, response)
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"Invalid refresh token: {str(e)}",
-        )
+    except Exception:
+        raise AuthException(message="유효하지 않은 접근입니다.")
 
 
-@router.post("/logout")
-async def logout(response: Response):
-    """
-    로그아웃 - refresh token 쿠키 삭제
-    """
-    response.delete_cookie(key="ltp_refresh_token")
-    return {"detail": "Successfully logged out"}
+# @router.post("/logout")
+# async def logout(response: Response):
+#     """
+#     로그아웃 - refresh token 쿠키 삭제
+#     """
+#     response.delete_cookie(key="ltp_refresh_token")
+#     return {"detail": "Successfully logged out"}

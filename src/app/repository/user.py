@@ -22,7 +22,10 @@ class UserRepository:
         default_user_level_id = 1
 
         new_user = User(
-            **user_data.model_dump(),
+            email=user_data.email,
+            first_name=user_data.first_name,
+            last_name=user_data.last_name,
+            phone=user_data.phone,
             password=hashed_password,
             role_id=default_role_id,
             user_level_id=default_user_level_id,

@@ -1,30 +1,33 @@
 from fastapi import Depends
 from typing import Annotated
-from app.service.user import UserService
-from app.service.auth import AuthService
-from app.repository._deps import (
+from ..service.user import UserService
+from ..service.auth import AuthService
+from ..repository._deps import (
     userRepositoryDeps,
     userAddressRepositoryDeps,
-    rateRepositoryDeps,
     cargoRepositoryDeps,
     userLevelRepositoryDeps,
     quoteRepositoryDeps,
     quoteLocationRepositoryDeps,
     quoteLocationAccessorialRepositoryDeps,
     quoteCargoRepositoryDeps,
+    rateLocationRepositoryDeps,
+    rateAreaCostRepositoryDeps,
+    rateAreaRepositoryDeps,
 )
-from app.service.rate import RateService
-from app.service.cargo import CargoService
-from app.service.quote import QuoteService
-from app.service.cost import CostService
-from app.repository._deps import sessionDeps
+from ..service.rate import RateService
+from ..service.cargo import CargoService
+from ..service.quote import QuoteService
+from ..service.cost import CostService
+from ..repository._deps import sessionDeps
 
 
 # Service 의존성
 async def get_auth_service(
     user_repository: userRepositoryDeps,
+    user_level_repository: userLevelRepositoryDeps,
 ) -> AuthService:
-    return AuthService(user_repository)
+    return AuthService(user_repository, user_level_repository)
 
 
 async def get_user_service(
@@ -39,8 +42,8 @@ async def get_user_service(
     )
 
 
-async def get_rate_service(rate_repository: rateRepositoryDeps) -> RateService:
-    return RateService(rate_repository)
+async def get_rate_service(rate_location_repository: rateLocationRepositoryDeps) -> RateService:
+    return RateService(rate_location_repository)
 
 
 async def get_cargo_service(cargo_repository: cargoRepositoryDeps) -> CargoService:
@@ -55,21 +58,22 @@ async def get_quote_service(
     session: sessionDeps,
 ) -> QuoteService:
     service = QuoteService(
-        quote_repository, 
-        quote_location_repository, 
+        quote_repository,
+        quote_location_repository,
         quote_location_accessorial_repository,
-        quote_cargo_repository
+        quote_cargo_repository,
     )
     service.db = session  # DB 세션 설정
     return service
 
 
 async def get_cost_service(
-    rate_repository: rateRepositoryDeps,
+    rate_area_repository: rateAreaRepositoryDeps,
+    rate_area_cost_repository: rateAreaCostRepositoryDeps,
     user_repository: userRepositoryDeps,
     user_level_repository: userLevelRepositoryDeps,
 ) -> CostService:
-    return CostService(rate_repository, user_repository, user_level_repository)
+    return CostService(rate_area_repository, rate_area_cost_repository, user_repository, user_level_repository)
 
 
 authServiceDeps = Annotated[AuthService, Depends(get_auth_service)]

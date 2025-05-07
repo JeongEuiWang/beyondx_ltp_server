@@ -1,5 +1,5 @@
-from fastapi import APIRouter, Query, Depends, status, Path
-from typing import Optional, List
+from fastapi import APIRouter, status
+from typing import List
 from ..service._deps import cargoServiceDeps
 from ..schema.cargo import CargoTransportationResponse, CargoAccessorialResponse
 

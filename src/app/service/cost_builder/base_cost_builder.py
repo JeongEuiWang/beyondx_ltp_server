@@ -1,10 +1,15 @@
-from pprint import pprint
-from typing import List, Optional, Dict, Any
+from typing import List
 from decimal import Decimal
+from dataclasses import dataclass
+from ...core.utils import round_up_decimal
+from ...schema.cost import BaseCostSchema
 
-from app.core.utils import round_up_decimal
-from app.schema.cost import BaseCost, RateCost
 
+@dataclass
+class RateCost:
+    min_weight: Decimal
+    max_weight: Decimal
+    price_per_weight: Decimal
 
 class BaseCostBuilder:
     def __init__(self, fsc: Decimal):
@@ -78,9 +83,11 @@ class BaseCostBuilder:
         self._final_cost = round_up_decimal(self._freight_cost * (1 + self._fsc))
         return self
 
-    def calculate(self) -> BaseCost:
-        return BaseCost(
-            cost=self._final_cost,
-            freight_weight=self._freight_weight,
-            is_max_load=self._is_max_load,
-        )
+    def calculate(self) -> BaseCostSchema:
+        result = {
+          "cost": self._final_cost,
+          "freight_weight": self._freight_weight,
+          "is_max_load": self._is_max_load,
+        }
+        return BaseCostSchema.model_validate(result)
+

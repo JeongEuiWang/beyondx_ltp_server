@@ -10,9 +10,17 @@ from unittest.mock import MagicMock
 from app.service.cost_builder.base_cost_builder import BaseCostBuilder
 from app.service.cost_builder.location_type_cost_builder import LocationCostBuilder
 from app.service.cost_builder.extra_cost_builder import ExtraCostBuilder
-from app.schema.cost import BaseCost, RateCost
-from app.schema.quote import QuoteLocationRequest, QuoteLocationAccessorialRequest
+from app.schema.cost.response import BaseCostSchema
+from app.schema._common import QuoteLocationSchema
+from app.schema._common import QuoteLocationAccessorialSchema
 from app.model._enum import LocationTypeEnum
+
+# RateCost 클래스 정의 (기존 RateCost를 대체하기 위한 임시 클래스)
+class RateCost:
+    def __init__(self, min_weight, max_weight, price_per_weight):
+        self.min_weight = min_weight
+        self.max_weight = max_weight
+        self.price_per_weight = price_per_weight
 
 
 class TestBaseCostBuilder:
@@ -169,7 +177,7 @@ class TestLocationCostBuilder:
 
     def test_commercial_location(self):
         """상업 지역 비용 테스트"""
-        base_cost = BaseCost(
+        base_cost = BaseCostSchema(
             cost=Decimal("500"),
             freight_weight=Decimal("100"),
             is_max_load=False
@@ -186,7 +194,7 @@ class TestLocationCostBuilder:
     
     def test_residential_location(self):
         """주거 지역 비용 테스트"""
-        base_cost = BaseCost(
+        base_cost = BaseCostSchema(
             cost=Decimal("500"),
             freight_weight=Decimal("100"),
             is_max_load=False
@@ -203,7 +211,7 @@ class TestLocationCostBuilder:
     
     def test_airport_location_pickup(self):
         """공항 픽업 비용 테스트"""
-        base_cost = BaseCost(
+        base_cost = BaseCostSchema(
             cost=Decimal("500"),
             freight_weight=Decimal("100"),
             is_max_load=False
@@ -216,7 +224,7 @@ class TestLocationCostBuilder:
         assert builder._final_cost == Decimal("30")
         
         # 무게가 큰 경우
-        base_cost = BaseCost(
+        base_cost = BaseCostSchema(
             cost=Decimal("500"),
             freight_weight=Decimal("10000"),
             is_max_load=False
@@ -230,7 +238,7 @@ class TestLocationCostBuilder:
     
     def test_airport_location_delivery(self):
         """공항 배송 비용 테스트"""
-        base_cost = BaseCost(
+        base_cost = BaseCostSchema(
             cost=Decimal("500"),
             freight_weight=Decimal("1000"),
             is_max_load=False
@@ -243,7 +251,7 @@ class TestLocationCostBuilder:
         assert builder._final_cost == Decimal("30")
         
         # 최소/최대 값 테스트
-        base_cost = BaseCost(
+        base_cost = BaseCostSchema(
             cost=Decimal("500"),
             freight_weight=Decimal("500"),
             is_max_load=False
@@ -257,7 +265,7 @@ class TestLocationCostBuilder:
     
     def test_multiple_location_types(self):
         """여러 위치 유형 조합 테스트"""
-        base_cost = BaseCost(
+        base_cost = BaseCostSchema(
             cost=Decimal("500"),
             freight_weight=Decimal("100"),
             is_max_load=False
@@ -280,7 +288,7 @@ class TestExtraCostBuilder:
 
     def test_accessorial_costs(self):
         """부가 서비스 비용 테스트"""
-        base_cost = BaseCost(
+        base_cost = BaseCostSchema(
             cost=Decimal("500"),
             freight_weight=Decimal("100"),
             is_max_load=False
@@ -289,7 +297,7 @@ class TestExtraCostBuilder:
         builder = ExtraCostBuilder(base_cost=base_cost)
         
         # Inside Delivery 테스트
-        location = QuoteLocationRequest(
+        location = QuoteLocationSchema(
             state="뉴욕",
             county="뉴욕",
             city="뉴욕시",
@@ -298,7 +306,7 @@ class TestExtraCostBuilder:
             location_type=LocationTypeEnum.COMMERCIAL,
             request_datetime=datetime.datetime.now(),
             accessorials=[
-                QuoteLocationAccessorialRequest(
+                QuoteLocationAccessorialSchema(
                     cargo_accessorial_id=1,
                     name="Inside Delivery"
                 )
@@ -311,7 +319,7 @@ class TestExtraCostBuilder:
         
         # Two Person 추가
         location.accessorials.append(
-            QuoteLocationAccessorialRequest(
+            QuoteLocationAccessorialSchema(
                 cargo_accessorial_id=2,
                 name="Two Person"
             )
@@ -324,7 +332,7 @@ class TestExtraCostBuilder:
         
         # Lift Gate 추가
         location.accessorials.append(
-            QuoteLocationAccessorialRequest(
+            QuoteLocationAccessorialSchema(
                 cargo_accessorial_id=3,
                 name="Lift Gate"
             )
@@ -337,7 +345,7 @@ class TestExtraCostBuilder:
     
     def test_inside_delivery_weight_based(self):
         """Inside Delivery가 무게에 따라 계산되는 경우 테스트"""
-        base_cost = BaseCost(
+        base_cost = BaseCostSchema(
             cost=Decimal("500"),
             freight_weight=Decimal("2000"),
             is_max_load=False
@@ -346,7 +354,7 @@ class TestExtraCostBuilder:
         builder = ExtraCostBuilder(base_cost=base_cost)
         
         # 무게가 큰 경우 Inside Delivery 비용 테스트
-        location = QuoteLocationRequest(
+        location = QuoteLocationSchema(
             state="뉴욕",
             county="뉴욕",
             city="뉴욕시",
@@ -355,7 +363,7 @@ class TestExtraCostBuilder:
             location_type=LocationTypeEnum.COMMERCIAL,
             request_datetime=datetime.datetime.now(),
             accessorials=[
-                QuoteLocationAccessorialRequest(
+                QuoteLocationAccessorialSchema(
                     cargo_accessorial_id=1,
                     name="Inside Delivery"
                 )
@@ -368,7 +376,7 @@ class TestExtraCostBuilder:
     
     def test_weekend_cost(self):
         """주말 비용 테스트"""
-        base_cost = BaseCost(
+        base_cost = BaseCostSchema(
             cost=Decimal("500"),
             freight_weight=Decimal("100"),
             is_max_load=False
@@ -379,7 +387,7 @@ class TestExtraCostBuilder:
         # 주말(토요일) 테스트
         # 2023년 6월 3일은 토요일
         saturday = datetime.datetime(2023, 6, 3, 12, 0)
-        location = QuoteLocationRequest(
+        location = QuoteLocationSchema(
             state="뉴욕",
             county="뉴욕",
             city="뉴욕시",
@@ -406,7 +414,7 @@ class TestExtraCostBuilder:
     
     def test_after_hour_cost(self):
         """영업 시간 외 비용 테스트"""
-        base_cost = BaseCost(
+        base_cost = BaseCostSchema(
             cost=Decimal("500"),
             freight_weight=Decimal("100"),
             is_max_load=False
@@ -416,7 +424,7 @@ class TestExtraCostBuilder:
         
         # 영업 시간 외(18시) 테스트
         after_hour = datetime.datetime(2023, 6, 7, 18, 0)  # 수요일 18시
-        location = QuoteLocationRequest(
+        location = QuoteLocationSchema(
             state="뉴욕",
             county="뉴욕",
             city="뉴욕시",
@@ -442,7 +450,7 @@ class TestExtraCostBuilder:
     
     def test_priority_cost(self):
         """우선 순위 비용 테스트"""
-        base_cost = BaseCost(
+        base_cost = BaseCostSchema(
             cost=Decimal("500"),
             freight_weight=Decimal("100"),
             is_max_load=False
@@ -452,7 +460,7 @@ class TestExtraCostBuilder:
         
         # 우선 순위 + 영업 시간 내 테스트
         business_hour = datetime.datetime(2023, 6, 7, 14, 0)  # 수요일 14시
-        location = QuoteLocationRequest(
+        location = QuoteLocationSchema(
             state="뉴욕",
             county="뉴욕",
             city="뉴욕시",
@@ -486,7 +494,7 @@ class TestExtraCostBuilder:
     
     def test_combined_costs(self):
         """모든 비용 조합 테스트"""
-        base_cost = BaseCost(
+        base_cost = BaseCostSchema(
             cost=Decimal("500"),
             freight_weight=Decimal("100"),
             is_max_load=False
@@ -496,7 +504,7 @@ class TestExtraCostBuilder:
         
         # 부가 서비스 + 주말 + 우선 순위 조합 테스트
         saturday = datetime.datetime(2023, 6, 3, 12, 0)  # 토요일 12시
-        location = QuoteLocationRequest(
+        location = QuoteLocationSchema(
             state="뉴욕",
             county="뉴욕",
             city="뉴욕시",
@@ -505,11 +513,11 @@ class TestExtraCostBuilder:
             location_type=LocationTypeEnum.COMMERCIAL,
             request_datetime=saturday,
             accessorials=[
-                QuoteLocationAccessorialRequest(
+                QuoteLocationAccessorialSchema(
                     cargo_accessorial_id=1,
                     name="Inside Delivery"
                 ),
-                QuoteLocationAccessorialRequest(
+                QuoteLocationAccessorialSchema(
                     cargo_accessorial_id=3,
                     name="Lift Gate"
                 )

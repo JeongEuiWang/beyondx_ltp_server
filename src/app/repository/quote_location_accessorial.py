@@ -10,6 +10,16 @@ class QuoteLocationAccessorialRepository:
     def __init__(self, db_session: AsyncSession):
         self.db_session = db_session
 
+    async def get_quote_location_accessorial_by_id(
+        self, quote_location_accessorial_id: int
+    ) -> QuoteLocationAccessorial | None:
+        result = await self.db_session.execute(
+            select(QuoteLocationAccessorial).where(
+                QuoteLocationAccessorial.id == quote_location_accessorial_id
+            )
+        )
+        return result.scalars_one_or_none()
+
     async def get_quote_location_accessorials(
         self, quote_location_id: int
     ) -> List[QuoteLocationAccessorial]:
@@ -17,9 +27,7 @@ class QuoteLocationAccessorialRepository:
         result = await self.db_session.execute(
             select(QuoteLocationAccessorial)
             .options(joinedload(QuoteLocationAccessorial.cargo_accessorial))
-            .where(
-                QuoteLocationAccessorial.quote_location_id == quote_location_id
-            )
+            .where(QuoteLocationAccessorial.quote_location_id == quote_location_id)
         )
         return result.scalars().all()
 
@@ -27,7 +35,7 @@ class QuoteLocationAccessorialRepository:
         self,
         quote_location_id: int,
         quote_location_accessorial: List[QuoteLocationAccessorial],
-    ):
+    ) -> List[QuoteLocationAccessorial]:
         """인용 위치 부가 서비스를 생성합니다."""
         quote_location_accessorials = [
             QuoteLocationAccessorial(
@@ -38,7 +46,8 @@ class QuoteLocationAccessorialRepository:
         ]
         self.db_session.add_all(quote_location_accessorials)
         await self.db_session.flush()
-
+        return quote_location_accessorials
+      
     async def delete_quote_location_accessorial(self, quote_location_id: int):
         """인용 위치 부가 서비스를 모두 삭제합니다."""
         await self.db_session.execute(

@@ -7,8 +7,8 @@ from unittest.mock import AsyncMock
 from fastapi import HTTPException, status
 from typing import List
 
-# 스키마만 임포트하고 서비스나 리포지토리는 임포트하지 않음
-from src.app.schema.cargo import CargoTransportationResponse, CargoAccessorialResponse
+# 스키마 경로 수정
+from app.schema.cargo.response import CargoTransportationResponse, CargoAccessorialResponse
 
 # 서비스 클래스를 모킹
 class MockCargoService:
@@ -112,8 +112,8 @@ class TestCargoService:
         """부가 서비스 조회 성공 테스트"""
         # Mock 데이터 설정
         mock_accessorials = [
-            {"id": 1, "name": "검역", "description": "화물 검역 서비스", "price": 50000},
-            {"id": 2, "name": "포장", "description": "화물 포장 서비스", "price": 30000}
+            {"id": 1, "name": "검역", "description": "화물 검역 서비스"},
+            {"id": 2, "name": "포장", "description": "화물 포장 서비스"}
         ]
         cargo_repository_mock.get_cargo_accessorial.return_value = mock_accessorials
         
@@ -126,7 +126,6 @@ class TestCargoService:
         assert result[0].id == 1
         assert result[0].name == "검역"
         assert result[0].description == "화물 검역 서비스"
-        assert result[0].price == 50000
         
         # 리포지토리 메서드 호출 확인
         cargo_repository_mock.get_cargo_accessorial.assert_called_once()

@@ -9,6 +9,12 @@ from app.model._enum import ShipmentTypeEnum
 class QuoteLocationRepository:
     def __init__(self, db_session: AsyncSession):
         self.db_session = db_session
+        
+    async def get_quote_location_by_id(self, quote_location_id: int) -> QuoteLocation | None:
+        result = await self.db_session.execute(
+            select(QuoteLocation).where(QuoteLocation.id == quote_location_id)
+        )
+        return result.scalar_one_or_none()
     
     async def get_quote_locations_by_quote_id(self, quote_id: str) -> List[QuoteLocation]:
         result = await self.db_session.execute(
@@ -18,21 +24,21 @@ class QuoteLocationRepository:
 
     async def get_quote_location_by_shipment_type(
         self, quote_id: str, shipment_type: ShipmentTypeEnum
-    ) -> Optional[QuoteLocation]:
+    ) -> QuoteLocation | None:
         result = await self.db_session.execute(
             select(QuoteLocation).where(
                 QuoteLocation.quote_id == quote_id,
                 QuoteLocation.shipment_type == shipment_type,
             )
         )
-        return result.scalars().first()
+        return result.scalar_one_or_none()
 
     async def create_quote_location(
         self,
         quote_id: int,
         quote_location: QuoteLocation,
         shipment_type: ShipmentTypeEnum,
-    ):
+    ) -> QuoteLocation:
         quote_location = QuoteLocation(
             quote_id=quote_id,
             state=quote_location.state,
@@ -50,7 +56,7 @@ class QuoteLocationRepository:
 
     async def update_quote_location(
         self, quote_location_id: int, quote_location: dict
-    ) -> Optional[QuoteLocation]:
+    ) -> QuoteLocation:
         """인용 위치를 업데이트합니다."""
         # 업데이트할 값 준비 - 클라이언트에서 모든 정보를 전달하므로 모든 필드 업데이트
         values = {
@@ -72,7 +78,4 @@ class QuoteLocationRepository:
         await self.db_session.flush()
 
         # 업데이트된 인용 위치 반환
-        result = await self.db_session.execute(
-            select(QuoteLocation).where(QuoteLocation.id == quote_location_id)
-        )
-        return result.scalars().first()
+        return await self.get_quote_location_by_id(quote_location_id)

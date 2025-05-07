@@ -2,7 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from typing import List
 from ..model.user import UserAddress
-from ..schema.user_address import CreateUserAddressRequest
+from ..schema.user import CreateUserAddressRequest
 
 
 class UserAddressRepository:
@@ -13,14 +13,14 @@ class UserAddressRepository:
         self, user_id: int, address_data: CreateUserAddressRequest
     ) -> UserAddress:
         new_address = UserAddress(
-            user_id=user_id,
             name=address_data.name,
             state=address_data.state,
-            city=address_data.city,
             county=address_data.county,
+            city=address_data.city,
             zip_code=address_data.zip_code,
             location_type=address_data.location_type,
             address=address_data.address,
+            user_id=user_id
         )
         self.db_session.add(new_address)
         await self.db_session.commit()

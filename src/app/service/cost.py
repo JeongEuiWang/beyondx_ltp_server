@@ -1,46 +1,56 @@
 from decimal import Decimal
+from typing import List
 
-from app.repository.rate import RateRepository
-from app.repository.user import UserRepository
-from app.repository.user_level import UserLevelRepository
-from app.schema.quote import QuoteLocationSchema
-from app.service.cost_builder import (
+from ..repository.rate_area import RateAreaRepository
+from ..repository.rate_area_cost import RateAreaCostRepository
+from ..repository.user import UserRepository
+from ..repository.user_level import UserLevelRepository
+from ..schema import QuoteLocationSchema, QuoteCargoSchema
+from ..service.cost_builder import (
     BaseCostBuilder,
     ExtraCostBuilder,
     LocationCostBuilder,
     DiscountBuilder,
 )
-from app.schema.cost import BaseCost, DiscountCost, ExtraCost, LocationCost
+from ..schema.cost import (
+    BaseCostSchema,
+    DiscountCostSchema,
+    ExtraCostSchema,
+    LocationCostSchema,
+)
 
 
 class CostService:
     def __init__(
         self,
-        rate_repository: RateRepository,
+        rate_area_repository: RateAreaRepository,
+        rate_area_cost_repository: RateAreaCostRepository,
         user_repository: UserRepository,
         user_level_repository: UserLevelRepository,
     ):
-        self.rate_repository = rate_repository
+        self.rate_area_repository = rate_area_repository
+        self.rate_area_cost_repository = rate_area_cost_repository
         self.user_level_repository = user_level_repository
         self.user_repository = user_repository
 
     async def calculate_base_cost(
         self,
-        cargo_list,
+        cargo_list: List[QuoteCargoSchema],
         from_location: QuoteLocationSchema,
         to_location: QuoteLocationSchema,
-    ) -> BaseCost:
+    ) -> BaseCostSchema:
         builder = BaseCostBuilder(fsc=Decimal("0.35"))
+        
         for cargo in cargo_list:
             builder.set_freight_weight(
                 cargo.weight, cargo.quantity, cargo.width, cargo.height, cargo.length
             )
 
         # 지역 요율 계산
-        from_location_area = await self.rate_repository.get_area_by_zip_code(
+        from_location_area = await self.rate_area_repository.get_area_by_zip_code(
             from_location.zip_code
         )
-        to_location_area = await self.rate_repository.get_area_by_zip_code(
+        to_location_area = await self.rate_area_repository.get_area_by_zip_code(
             to_location.zip_code
         )
 
@@ -55,8 +65,8 @@ class CostService:
         )
         base_area_id = base_area.id
 
-        area_costs = await self.rate_repository.get_area_costs(base_area_id)
-
+        area_costs = await self.rate_area_cost_repository.get_area_costs(base_area_id)
+        
         builder.set_location_rate(
             min_load=base_area.min_load,
             max_load=base_area.max_load,
@@ -73,8 +83,8 @@ class CostService:
         self,
         from_location: QuoteLocationSchema,
         to_location: QuoteLocationSchema,
-        base_cost: BaseCost,
-    ) -> LocationCost:
+        base_cost: BaseCostSchema,
+    ) -> LocationCostSchema:
         builder = LocationCostBuilder(base_cost=base_cost)
         builder.check_location_type(from_location.location_type, "PICK_UP")
         builder.check_location_type(to_location.location_type, "DELIVERY")
@@ -86,8 +96,8 @@ class CostService:
         is_priority: bool,
         from_location: QuoteLocationSchema,
         to_location: QuoteLocationSchema,
-        base_cost: BaseCost,
-    ) -> ExtraCost:
+        base_cost: BaseCostSchema,
+    ) -> ExtraCostSchema:
         builder = ExtraCostBuilder(base_cost=base_cost)
         builder.calculate_accesserial(from_location)
         builder.calculate_accesserial(to_location)
@@ -99,7 +109,7 @@ class CostService:
         self,
         user_id: int,
         total_cost: Decimal,
-    ) -> DiscountCost:
+    ) -> DiscountCostSchema:
         builder = DiscountBuilder(total_cost=total_cost)
         user = await self.user_repository.get_user_by_id(user_id)
         if user is None:

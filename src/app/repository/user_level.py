@@ -1,7 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from typing import List
-from app.model.user import UserLevel
+from ..model.user import UserLevel
 
 
 class UserLevelRepository:

@@ -1,10 +1,9 @@
-from pprint import pprint
-from typing import List, Literal, Optional, Dict, Any
+from typing import Literal
 from decimal import Decimal
 
-from app.core.utils import round_up_decimal
-from app.model._enum import LocationTypeEnum
-from app.schema.cost import BaseCost, LocationCost
+from ...core.utils import round_up_decimal
+from ...model._enum import LocationTypeEnum
+from ...schema.cost import BaseCostSchema, LocationCostSchema
 
 
 class LocationCostBuilder:
@@ -25,7 +24,7 @@ class LocationCostBuilder:
         },
     }
 
-    def __init__(self, base_cost: BaseCost):
+    def __init__(self, base_cost: BaseCostSchema):
         self._base_cost = base_cost
         self._final_cost = Decimal(0)
 
@@ -61,5 +60,8 @@ class LocationCostBuilder:
         else:
             return cost_with_weight
 
-    def calculate(self) -> LocationCost:
-        return LocationCost(cost=self._final_cost)
+    def calculate(self) -> LocationCostSchema:
+        result = {
+          "cost": self._final_cost,
+        } 
+        return LocationCostSchema.model_validate(result)

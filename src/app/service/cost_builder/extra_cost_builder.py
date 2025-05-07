@@ -1,13 +1,13 @@
 from datetime import datetime
 from decimal import Decimal
 
-from app.core.utils import round_up_decimal
-from app.schema.cost import BaseCost, ExtraCost
-from app.schema.quote import QuoteLocationSchema
+from ...core.utils import round_up_decimal
+from ...schema.cost import BaseCostSchema, ExtraCostSchema
+from ...schema import QuoteLocationSchema
 
 
 class ExtraCostBuilder:
-    def __init__(self, base_cost: BaseCost):
+    def __init__(self, base_cost: BaseCostSchema):
         self._base_cost = base_cost
         self._final_cost = Decimal(0)
 
@@ -25,7 +25,10 @@ class ExtraCostBuilder:
         return self
 
     def _calculate_inside_delivery_cost(self) -> Decimal:
-        return max(Decimal(25), round_up_decimal(self._base_cost.freight_weight * Decimal("0.02")))
+        return max(
+            Decimal(25),
+            round_up_decimal(self._base_cost.freight_weight * Decimal("0.02")),
+        )
 
     def _calculate_two_person_cost(self) -> Decimal:
         return Decimal(80)
@@ -67,5 +70,8 @@ class ExtraCostBuilder:
         else:
             return Decimal(0)
 
-    def calculate(self) -> ExtraCost:
-        return ExtraCost(cost=self._final_cost)
+    def calculate(self) -> ExtraCostSchema:
+        result = {
+            "cost": self._final_cost,
+        }
+        return ExtraCostSchema.model_validate(result)

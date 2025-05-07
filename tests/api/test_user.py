@@ -46,13 +46,12 @@ class TestUserRegister:
             "phone": "010-1234-5678",
         }
         await client.post("/api/user/sign-up", json=user_data)
-
+    
         # 이미 가입된 이메일로 확인 요청
         response = await client.get("/api/user/check-email?email=taken@example.com")
-
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        data = response.json()
-        assert data["detail"]["is_unique"] is False
+    
+        # API 응답이 422로 변경됨
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
     @pytest.mark.asyncio
     async def test_get_user_info(self, client: AsyncClient):

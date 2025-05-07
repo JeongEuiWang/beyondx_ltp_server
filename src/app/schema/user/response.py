@@ -1,34 +1,22 @@
-from ..base import BaseSchema
-from app.model._enum import UserLevelEnum
-from ._common import CommonUserSchema, CommonUserAddressSchema
+from .._base import BaseSchema, IntegerIDSchema
+from .._common import BaseUserSchema, BaseUserAddressSchema
 
 
 class CheckEmailResponse(BaseSchema):
     is_unique: bool
 
 
-class CreateUserResponse(CommonUserSchema):
+class CreateUserResponse(BaseSchema):
     success: bool
 
 
-class UserLevelResponse(BaseSchema):
-    id: int
-    level: UserLevelEnum
-    required_amount: float
-    discount_rate: float
+class GetUserInfoResponse(IntegerIDSchema, BaseUserSchema):
+    pass
 
 
-class GetUserInfoResponse(CommonUserSchema):
-    id: int
-    total_payment_amount: float
-    user_level: UserLevelResponse
-
-
-class CreateUserAddressResponse(CommonUserAddressSchema):
-    id: int
+class CreateUserAddressResponse(IntegerIDSchema, BaseUserAddressSchema):
     user_id: int
 
 
-class GetUserAddressResponse(CommonUserAddressSchema):
-    id: int
+class GetUserAddressResponse(IntegerIDSchema, BaseUserAddressSchema):
     user_id: int

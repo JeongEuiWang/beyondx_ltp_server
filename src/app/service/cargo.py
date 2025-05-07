@@ -1,5 +1,3 @@
-from fastapi import HTTPException
-from typing import Optional
 from ..schema.cargo import CargoTransportationResponse, CargoAccessorialResponse
 from ..repository.cargo import CargoRepository
 from typing import List

@@ -1,5 +1,11 @@
 from decimal import Decimal
 from typing import List
+
+from fastapi import HTTPException
+
+from app.service.email import EmailSender
+from bol import create_structured_bill_of_lading
+import os
 from ..core.decorator import transactional
 from ..core.exceptions import NotFoundException
 from ..model._enum import ShipmentTypeEnum
@@ -7,6 +13,8 @@ from ..schema._common import BaseQuoteSchema
 from ..schema.quote import (
     CreateQuoteRequest,
     UpdateQuoteRequest,
+    GetQuotesResponse,
+    GetQuoteDetailsResponse
 )
 from ..repository.quote import QuoteRepository
 from ..repository.quote_location import QuoteLocationRepository
@@ -29,14 +37,18 @@ class QuoteService:
         )
         self.quote_cargo_repository = quote_cargo_repository
         self.db = None
+        
+    async def get_quotes(self, user_id: int) -> List[GetQuotesResponse]:
+        result = await self.quote_repository.get_quotes(user_id)
+        return [GetQuotesResponse.model_validate(quote) for quote in result]
 
-    async def get_quote_by_id(self, quote_id: str, user_id: int) -> BaseQuoteSchema:
+    async def get_quote_by_id(self, quote_id: str, user_id: int) -> GetQuoteDetailsResponse:
         result = await self.quote_repository.get_quote_by_id(quote_id, user_id)
         if result is None:
             raise NotFoundException(
                 message="견적을 찾을 수 없습니다.",
             )
-        return BaseQuoteSchema.model_validate(result)
+        return GetQuoteDetailsResponse.model_validate(result)
 
     @transactional()
     async def create_quote(
@@ -164,3 +176,26 @@ class QuoteService:
             await self.quote_location_accessorial_repository.create_quote_location_accessorial(
                 location_id, to_add
             )
+
+    @transactional()
+    async def submit_quote(self, quote_id: str, user_id: int):
+      try:
+        quote_details = await self.get_quote_by_id(quote_id, user_id)
+        quote_json_payload = quote_details.model_dump()
+        print(quote_json_payload)
+        await create_structured_bill_of_lading(quote_json_payload, "structured_bill_of_lading.pdf")
+        email_service = EmailSender(
+            subject="BeyondX ",
+            receiver_email="wang323@naver.com",
+            client_id=quote_details.id,
+            quote=quote_details.total_price,
+            pdf_buffer=open("structured_bill_of_lading.pdf", "rb").read(),
+            pdf_filename="structured_bill_of_lading.pdf"
+        )
+        await email_service.send_email()
+      except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+      finally:
+        os.remove("structured_bill_of_lading.pdf")
+      await self.quote_repository.submit_quote(quote_id, user_id)
+      return quote_details

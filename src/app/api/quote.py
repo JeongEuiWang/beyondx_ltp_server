@@ -1,3 +1,4 @@
+from typing import List
 from fastapi import APIRouter, HTTPException, status, Path
 
 from ..core.exceptions import BadRequestException, NotFoundException
@@ -6,7 +7,12 @@ from ..service._deps import (
     quoteServiceDeps,
     costServiceDeps,
 )
-from ..schema.quote import CreateQuoteRequest, UpdateQuoteRequest
+from ..schema.quote import (
+    CreateQuoteRequest,
+    UpdateQuoteRequest,
+    GetQuotesResponse,
+    GetQuoteDetailsResponse,
+)
 
 router = APIRouter(prefix="/quote", tags=["quote"])
 
@@ -53,6 +59,31 @@ async def create_quote(
         extra_price=extra_price,
         total_price_with_discount=total_price_with_discount.cost,
     )
+
+
+@router.get(
+    "",
+    status_code=status.HTTP_200_OK,
+    response_model=List[GetQuotesResponse],
+)
+async def get_quotes(
+    quote_service: quoteServiceDeps,
+    token_data: requiredAuthDeps,
+):
+    return await quote_service.get_quotes(token_data.user_id)
+
+
+@router.get(
+    "/{quote_id}",
+    status_code=status.HTTP_200_OK,
+    response_model=GetQuoteDetailsResponse,
+)
+async def get_quote_details(
+    quote_service: quoteServiceDeps,
+    token_data: requiredAuthDeps,
+    quote_id: str = Path(..., description="인용 ID"),
+):
+    return await quote_service.get_quote_by_id(quote_id, token_data.user_id)
 
 
 @router.put(
@@ -109,3 +140,15 @@ async def update_quote(
         extra_price=extra_price,
         total_price_with_discount=total_price_with_discount.cost,
     )
+
+@router.post(
+    "/{quote_id}/submit",
+    status_code=status.HTTP_200_OK,
+    response_model=None,
+)
+async def submit_quote(
+    quote_service: quoteServiceDeps,
+    token_data: requiredAuthDeps,
+    quote_id: str = Path(..., description="인용 ID"),
+):
+    return await quote_service.submit_quote(quote_id, token_data.user_id)

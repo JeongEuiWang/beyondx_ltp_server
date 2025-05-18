@@ -26,6 +26,12 @@ class Settings(BaseSettings):
     DB_USER: str
     DB_PASS: str
     DB_NAME: str
+    
+    SMTP_HOST: str
+    SMTP_PORT: int
+    SMTP_EMAIL_USERNAME: str
+    SMTP_EMAIL_PASSWORD: str
+    SMTP_SENDER_EMAIL: str
 
     @property
     def DB_URL(self) -> str:

@@ -87,6 +87,7 @@ class QuoteCargo(AutoIntegerIdMixin, Base):
     quote_id = Column(String(32), ForeignKey("quote.id"), nullable=False)
     width = Column(Integer, nullable=False)
     length = Column(Integer, nullable=False)
+    weight = Column(Integer, nullable=False)
     height = Column(Integer, nullable=False)
     quantity = Column(Integer, nullable=False)
     package_description = Column(Text)

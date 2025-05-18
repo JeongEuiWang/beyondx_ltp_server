@@ -225,6 +225,7 @@ def upgrade() -> None:
         sa.Column("width", sa.Integer(), nullable=False),
         sa.Column("length", sa.Integer(), nullable=False),
         sa.Column("height", sa.Integer(), nullable=False),
+        sa.Column("weight", sa.Integer(), nullable=False),
         sa.Column("quantity", sa.Integer(), nullable=False),
         sa.Column("package_description", sa.Text(), nullable=True),
         sa.Column("cargo_stackable", sa.Boolean(), nullable=False),

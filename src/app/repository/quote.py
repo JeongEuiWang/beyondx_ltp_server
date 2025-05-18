@@ -1,21 +1,94 @@
 import uuid
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, update
+from sqlalchemy import select, update, join
+from sqlalchemy.orm import selectinload, joinedload
 from typing import List, Optional
 
-from app.model._enum import OrderStatusEnum
-from app.model.quote import Quote
+from app.model._enum import OrderStatusEnum, ShipmentTypeEnum
+from app.model.quote import Quote, QuoteLocation, QuoteCargo, QuoteLocationAccessorial
 
 
 class QuoteRepository:
     def __init__(self, db_session: AsyncSession):
         self.db_session = db_session
-
-    async def get_quote_by_id(self, quote_id: str, user_id: int) -> Quote | None:
+        
+    async def get_quotes(self, user_id: int) -> List[Quote]:
+        # 한 번의 쿼리로 견적서와 위치 정보를 함께 가져옴
         result = await self.db_session.execute(
-            select(Quote).where(Quote.id == quote_id, Quote.user_id == user_id)
+            select(Quote)
+            .options(selectinload(Quote.quote_location))
+            .where(Quote.user_id == user_id)
         )
-        return result.scalar_one_or_none()
+        quotes = result.scalars().all()
+        
+        if not quotes:
+            return []
+        
+        # 각 견적서에 위치 정보 설정
+        for quote in quotes:
+            for location in quote.quote_location:
+                location_data = {
+                    "id": location.id,
+                    "state": location.state,
+                    "county": location.county,
+                    "city": location.city,
+                    "zip_code": location.zip_code,
+                    "address": location.address,
+                    "request_datetime": location.request_datetime
+                }
+                
+                if location.shipment_type == ShipmentTypeEnum.PICKUP:
+                    quote.from_location = location_data
+                elif location.shipment_type == ShipmentTypeEnum.DELIVERY:
+                    quote.to_location = location_data
+        
+        return quotes
+
+    async def get_quote_by_id(self, quote_id: str, user_id: int):
+        result = await self.db_session.execute(
+            select(Quote)
+            .options(
+                selectinload(Quote.quote_location).selectinload(QuoteLocation.quote_location_accessorial).joinedload(QuoteLocationAccessorial.cargo_accessorial),
+                selectinload(Quote.quote_cargo)
+            )
+            .where(Quote.id == quote_id, Quote.user_id == user_id)
+        )
+        quote = result.scalar_one_or_none()
+        
+        if not quote:
+            return None
+        
+        # 위치 정보 설정
+        for location in quote.quote_location:
+            # 부가 서비스 데이터 변환
+            accessorials_data = []
+            for acc in location.quote_location_accessorial:
+                accessorials_data.append({
+                    "cargo_accessorial_id": acc.cargo_accessorial_id,
+                    "name": acc.cargo_accessorial.name if acc.cargo_accessorial else ""
+                })
+            
+            location_data = {
+                "id": location.id,
+                "state": location.state,
+                "county": location.county,
+                "city": location.city,
+                "zip_code": location.zip_code,
+                "address": location.address,
+                "location_type": location.location_type,
+                "request_datetime": location.request_datetime,
+                "accessorials": accessorials_data
+            }
+            
+            if location.shipment_type == ShipmentTypeEnum.PICKUP:
+                quote.from_location = location_data
+            elif location.shipment_type == ShipmentTypeEnum.DELIVERY:
+                quote.to_location = location_data
+        
+        # 화물 정보 설정 - GetQuoteDetailsResponse에서 필요한 cargo 필드
+        quote.cargo = quote.quote_cargo
+        
+        return quote
 
     async def create_quote(
         self,
@@ -74,3 +147,11 @@ class QuoteRepository:
 
         # 업데이트된 견적 반환
         return await self.get_quote_by_id(quote_id, user_id)
+    
+    async def submit_quote(self, quote_id: str, user_id: int):
+        await self.db_session.execute(
+            update(Quote)
+            .where(Quote.id == quote_id, Quote.user_id == user_id)
+            .values(order_status=OrderStatusEnum.SUBMIT)
+        )
+        await self.db_session.flush()

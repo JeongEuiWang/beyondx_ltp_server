@@ -18,6 +18,7 @@ class QuoteCargoRepository:
                 width=cargo.width,
                 length=cargo.length,
                 height=cargo.height,
+                weight=cargo.weight,
                 quantity=cargo.quantity,
                 package_description=cargo.package_description,
                 cargo_stackable=cargo.cargo_stackable,

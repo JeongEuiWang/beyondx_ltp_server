@@ -1,9 +1,11 @@
-from fastapi import APIRouter, Response
+from fastapi import APIRouter, Response, Depends
 from ..service import AuthService
 from ..core.jwt import decode_token
 from ..core.exceptions import AuthException
 from ..schema.auth import LoginRequest, LoginResponse, RefreshTokenResponse
-from ..core.dependencies import container
+from ..core.uow import get_uow
+from ..db.unit_of_work import UnitOfWork
+from ..core.auth import get_refresh_token_from_cookie
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -12,16 +14,17 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 async def login(
     request: LoginRequest,
     response: Response,
-    auth_service: AuthService = container.get("auth_service")
+    uow: UnitOfWork = Depends(get_uow),
 ):
+    auth_service = AuthService(uow)
     return await auth_service.login(request, response)
 
 
 @router.get("/refresh", response_model=RefreshTokenResponse)
 async def refresh(
     response: Response,
-    auth_service: AuthService = container.get("auth_service"),
-    refresh_token: str = container.get("refresh_from_cookie"),
+    uow: UnitOfWork = Depends(get_uow),
+    refresh_token: str = Depends(get_refresh_token_from_cookie),
 ):
     if not refresh_token:
         raise AuthException(message="유효하지 않은 접근입니다.")
@@ -30,16 +33,8 @@ async def refresh(
         payload = decode_token(refresh_token)
         user_id = int(payload.get("sub"))
         role_id = payload.get("role_id")
-
+        
+        auth_service = AuthService(uow)
         return await auth_service.refresh_token(user_id, role_id, response)
     except Exception:
         raise AuthException(message="유효하지 않은 접근입니다.")
-
-
-# @router.post("/logout")
-# async def logout(response: Response):
-#     """
-#     로그아웃 - refresh token 쿠키 삭제
-#     """
-#     response.delete_cookie(key="ltp_refresh_token")
-#     return {"detail": "Successfully logged out"}

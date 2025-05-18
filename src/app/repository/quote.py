@@ -6,6 +6,7 @@ from typing import List, Optional
 
 from app.model._enum import OrderStatusEnum, ShipmentTypeEnum
 from app.model.quote import Quote, QuoteLocation, QuoteCargo, QuoteLocationAccessorial
+from ..schema.quote.request import CreateQuoteRequest
 
 
 class QuoteRepository:
@@ -19,32 +20,11 @@ class QuoteRepository:
             .options(selectinload(Quote.quote_location))
             .where(Quote.user_id == user_id)
         )
-        quotes = result.scalars().all()
-        
-        if not quotes:
-            return []
-        
-        # 각 견적서에 위치 정보 설정
-        for quote in quotes:
-            for location in quote.quote_location:
-                location_data = {
-                    "id": location.id,
-                    "state": location.state,
-                    "county": location.county,
-                    "city": location.city,
-                    "zip_code": location.zip_code,
-                    "address": location.address,
-                    "request_datetime": location.request_datetime
-                }
-                
-                if location.shipment_type == ShipmentTypeEnum.PICKUP:
-                    quote.from_location = location_data
-                elif location.shipment_type == ShipmentTypeEnum.DELIVERY:
-                    quote.to_location = location_data
+        quotes = result.scalars().unique().all()
         
         return quotes
 
-    async def get_quote_by_id(self, quote_id: str, user_id: int):
+    async def get_quote_by_id(self, quote_id: str, user_id: int) -> Optional[Quote]:
         result = await self.db_session.execute(
             select(Quote)
             .options(
@@ -55,39 +35,6 @@ class QuoteRepository:
         )
         quote = result.scalar_one_or_none()
         
-        if not quote:
-            return None
-        
-        # 위치 정보 설정
-        for location in quote.quote_location:
-            # 부가 서비스 데이터 변환
-            accessorials_data = []
-            for acc in location.quote_location_accessorial:
-                accessorials_data.append({
-                    "cargo_accessorial_id": acc.cargo_accessorial_id,
-                    "name": acc.cargo_accessorial.name if acc.cargo_accessorial else ""
-                })
-            
-            location_data = {
-                "id": location.id,
-                "state": location.state,
-                "county": location.county,
-                "city": location.city,
-                "zip_code": location.zip_code,
-                "address": location.address,
-                "location_type": location.location_type,
-                "request_datetime": location.request_datetime,
-                "accessorials": accessorials_data
-            }
-            
-            if location.shipment_type == ShipmentTypeEnum.PICKUP:
-                quote.from_location = location_data
-            elif location.shipment_type == ShipmentTypeEnum.DELIVERY:
-                quote.to_location = location_data
-        
-        # 화물 정보 설정 - GetQuoteDetailsResponse에서 필요한 cargo 필드
-        quote.cargo = quote.quote_cargo
-        
         return quote
 
     async def create_quote(
@@ -97,23 +44,23 @@ class QuoteRepository:
         base_price: float,
         extra_price: float,
         total_price_with_discount: float,
-        quote: Quote,
-    ):
+        quote_payload: CreateQuoteRequest,
+    ) -> Quote:
         quote_id = str(uuid.uuid4().hex.upper())
-        quote = Quote(
+        new_quote = Quote(
             id=quote_id,
             user_id=user_id,
-            cargo_transportation_id=quote.cargo_transportation_id,
-            is_priority=quote.is_priority,
+            cargo_transportation_id=quote_payload.cargo_transportation_id,
+            is_priority=quote_payload.is_priority,
             total_weight=total_weight,
             base_price=base_price,
             extra_price=extra_price,
             total_price=total_price_with_discount,
             order_status=OrderStatusEnum.ESTIMATE,
         )
-        self.db_session.add(quote)
+        self.db_session.add(new_quote)
         await self.db_session.flush()
-        return quote
+        return new_quote
 
     async def update_quote(
         self,

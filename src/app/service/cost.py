@@ -1,10 +1,7 @@
 from decimal import Decimal
 from typing import List
 
-from ..repository.rate_area import RateAreaRepository
-from ..repository.rate_area_cost import RateAreaCostRepository
-from ..repository.user import UserRepository
-from ..repository.user_level import UserLevelRepository
+from ..db.unit_of_work import UnitOfWork
 from ..schema import QuoteLocationSchema, QuoteCargoSchema
 from ..service.cost_builder import (
     BaseCostBuilder,
@@ -18,20 +15,15 @@ from ..schema.cost import (
     ExtraCostSchema,
     LocationCostSchema,
 )
+from ..core.exceptions import NotFoundException
 
 
 class CostService:
     def __init__(
         self,
-        rate_area_repository: RateAreaRepository,
-        rate_area_cost_repository: RateAreaCostRepository,
-        user_repository: UserRepository,
-        user_level_repository: UserLevelRepository,
+        uow: UnitOfWork,
     ):
-        self.rate_area_repository = rate_area_repository
-        self.rate_area_cost_repository = rate_area_cost_repository
-        self.user_level_repository = user_level_repository
-        self.user_repository = user_repository
+        self.uow = uow
 
     async def calculate_base_cost(
         self,
@@ -40,42 +32,40 @@ class CostService:
         to_location: QuoteLocationSchema,
     ) -> BaseCostSchema:
         builder = BaseCostBuilder(fsc=Decimal("0.35"))
-        
-        for cargo in cargo_list:
-            builder.set_freight_weight(
-                cargo.weight, cargo.quantity, cargo.width, cargo.height, cargo.length
+        async with self.uow:
+            for cargo in cargo_list:
+                builder.set_freight_weight(
+                    cargo.weight, cargo.quantity, cargo.width, cargo.height, cargo.length
+                )
+
+            from_location_area = await self.uow.rate_areas.get_area_by_zip_code(
+                from_location.zip_code
+            )
+            to_location_area = await self.uow.rate_areas.get_area_by_zip_code(
+                to_location.zip_code
             )
 
-        # 지역 요율 계산
-        from_location_area = await self.rate_area_repository.get_area_by_zip_code(
-            from_location.zip_code
-        )
-        to_location_area = await self.rate_area_repository.get_area_by_zip_code(
-            to_location.zip_code
-        )
+            if from_location_area is None or to_location_area is None:
+                raise NotFoundException(message="지역 요율 정보를 찾을 수 없습니다.")
 
-        if from_location_area is None or to_location_area is None:
-            raise Exception("지역 요율 계산 중 오류가 발생했습니다.")
+            base_area = (
+                from_location_area
+                if from_location_area.id >= to_location_area.id
+                else to_location_area
+            )
+            base_area_id = base_area.id
 
-        # 현재 DB 기준 id 값이 클 수록 먼 지역, 이 기준은 변동될 수 있음
-        base_area = (
-            from_location_area
-            if from_location_area.id >= to_location_area.id
-            else to_location_area
-        )
-        base_area_id = base_area.id
+            area_costs = await self.uow.rate_area_costs.get_area_costs(base_area_id)
+            
+            builder.set_location_rate(
+                min_load=base_area.min_load,
+                max_load=base_area.max_load,
+                max_load_weight=base_area.max_load_weight,
+            )
 
-        area_costs = await self.rate_area_cost_repository.get_area_costs(base_area_id)
-        
-        builder.set_location_rate(
-            min_load=base_area.min_load,
-            max_load=base_area.max_load,
-            max_load_weight=base_area.max_load_weight,
-        )
-
-        builder.set_price_per_weight(area_costs)
-        builder.calculate_base_cost()
-        builder.calculate_with_fsc()
+            builder.set_price_per_weight(area_costs)
+            builder.calculate_base_cost()
+            builder.calculate_with_fsc()
 
         return builder.calculate()
 
@@ -111,16 +101,16 @@ class CostService:
         total_cost: Decimal,
     ) -> DiscountCostSchema:
         builder = DiscountBuilder(total_cost=total_cost)
-        user = await self.user_repository.get_user_by_id(user_id)
-        if user is None:
-            raise Exception("사용자 조회 중 오류가 발생했습니다.")
+        async with self.uow:
+            user = await self.uow.users.get_user_by_id(user_id)
+            if user is None:
+                raise NotFoundException(message=f"사용자 ID {user_id}를 찾을 수 없습니다.")
 
-        user_level = await self.user_level_repository.get_level_by_id(
-            user.user_level_id
-        )
-        if user_level is None:
-            raise Exception("사용자 레벨 조회 중 오류가 발생했습니다.")
+            user_level = await self.uow.user_levels.get_level_by_id(
+                user.user_level_id
+            )
+            if user_level is None:
+                raise NotFoundException(message=f"사용자 등급 ID {user.user_level_id}를 찾을 수 없습니다.")
 
-        builder.calculate_discount(user_level)
-
+            builder.calculate_discount(user_level)
         return builder.calculate()

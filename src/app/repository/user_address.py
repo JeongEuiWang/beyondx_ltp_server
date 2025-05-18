@@ -23,7 +23,7 @@ class UserAddressRepository:
             user_id=user_id
         )
         self.db_session.add(new_address)
-        await self.db_session.commit()
+        await self.db_session.flush()
         return new_address
 
     async def get_user_addresses_by_id(self, user_id: int) -> List[UserAddress]:

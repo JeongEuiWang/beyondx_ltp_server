@@ -2,11 +2,11 @@ from datetime import UTC, datetime
 from fastapi import Response
 
 from ..schema.auth import LoginRequest, LoginResponse, RefreshTokenResponse
-from ..core.auth import TokenData
+
 from ..core.security import verify_password
 from ..core.jwt import create_access_token, create_refresh_token
-from ..repository.user import UserRepository
-from ..repository.user_level import UserLevelRepository
+
+from ..db.unit_of_work import UnitOfWork
 from ..core.exceptions import AuthException, NotFoundException
 from ..core.config import settings
 
@@ -14,14 +14,13 @@ from ..core.config import settings
 class AuthService:
     def __init__(
         self,
-        user_repository: UserRepository,
-        user_level_repository: UserLevelRepository,
+        uow: UnitOfWork,  # UoW 주입
     ):
-        self.user_repository = user_repository
-        self.user_level_repository = user_level_repository
+        self.uow = uow
 
     async def login(self, request: LoginRequest, response: Response) -> LoginResponse:
-        user = await self.user_repository.get_user_by_email(request.email)
+        async with self.uow:  # UoW 컨텍스트 사용
+            user = await self.uow.users.get_user_by_email(request.email)
         if not user:
             raise AuthException(message="사용자를 찾을 수 없습니다.")
 
@@ -45,9 +44,7 @@ class AuthService:
             max_age=int((expires - datetime.now(UTC)).total_seconds()),
         )
 
-        user_level = await self.user_level_repository.get_level_by_id(
-            user.user_level_id
-        )
+        user_level = await self.uow.user_levels.get_level_by_id(user.user_level_id)
 
         if not user_level:
             raise NotFoundException(message="유효하지 않은 사용자 레벨입니다.")
@@ -73,7 +70,8 @@ class AuthService:
     async def refresh_token(
         self, user_id: int, role_id: int, response: Response
     ) -> RefreshTokenResponse:
-        user = await self.user_repository.get_user_by_id(user_id)
+        async with self.uow:  # UoW 컨텍스트 사용
+            user = await self.uow.users.get_user_by_id(user_id)
         if not user:
             raise NotFoundException(message="사용자를 찾을 수 없습니다.")
 
@@ -94,9 +92,7 @@ class AuthService:
             max_age=int((expires - datetime.now(UTC)).total_seconds()),
         )
 
-        user_level = await self.user_level_repository.get_level_by_id(
-            user.user_level_id
-        )
+        user_level = await self.uow.user_levels.get_level_by_id(user.user_level_id)
 
         if not user_level:
             raise NotFoundException(message="유효하지 않은 사용자 레벨입니다.")

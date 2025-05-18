@@ -4,6 +4,7 @@ from sqlalchemy.orm import joinedload
 from typing import List, Set
 
 from app.model.quote import QuoteLocationAccessorial
+from ..schema._common import QuoteLocationAccessorialSchema
 
 
 class QuoteLocationAccessorialRepository:
@@ -34,19 +35,19 @@ class QuoteLocationAccessorialRepository:
     async def create_quote_location_accessorial(
         self,
         quote_location_id: int,
-        quote_location_accessorial: List[QuoteLocationAccessorial],
+        accessorial_schemas: List[QuoteLocationAccessorialSchema],
     ) -> List[QuoteLocationAccessorial]:
         """인용 위치 부가 서비스를 생성합니다."""
-        quote_location_accessorials = [
+        new_accessorial_models = [
             QuoteLocationAccessorial(
                 quote_location_id=quote_location_id,
-                cargo_accessorial_id=accessorial.cargo_accessorial_id,
+                cargo_accessorial_id=schema.cargo_accessorial_id,
             )
-            for accessorial in quote_location_accessorial
+            for schema in accessorial_schemas
         ]
-        self.db_session.add_all(quote_location_accessorials)
+        self.db_session.add_all(new_accessorial_models)
         await self.db_session.flush()
-        return quote_location_accessorials
+        return new_accessorial_models
       
     async def delete_quote_location_accessorial(self, quote_location_id: int):
         """인용 위치 부가 서비스를 모두 삭제합니다."""

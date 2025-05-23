@@ -23,7 +23,6 @@ class AppException(Exception):
         super().__init__(self.message)
     
     def to_error_detail(self) -> ErrorDetail:
-        """ErrorDetail 모델로 변환"""
         return ErrorDetail(
             code=self.code,
             message=self.message,
@@ -34,7 +33,7 @@ class AuthException(AppException):
     def __init__(
         self,
         code: str = "UNAUTHORIZED",
-        message: str = "인증에 실패했습니다",
+        message: str = "Authentication failed",
         details: Optional[Dict[str, Any]] = None
     ):
         super().__init__(
@@ -48,7 +47,7 @@ class ForbiddenException(AppException):
     def __init__(
         self,
         code: str = "FORBIDDEN",
-        message: str = "이 작업을 수행할 권한이 없습니다",
+        message: str = "This operation is forbidden",
         details: Optional[Dict[str, Any]] = None
     ):
         super().__init__(
@@ -61,15 +60,10 @@ class ForbiddenException(AppException):
 class NotFoundException(AppException):
     def __init__(
         self,
-        entity: str,
-        entity_id: Union[str, int],
         code: str = "NOT_FOUND",
-        message: Optional[str] = None,
+        message: str = "Not found",
         details: Optional[Dict[str, Any]] = None
     ):
-        if message is None:
-            message = f"{entity}(id: {entity_id})를 찾을 수 없습니다"
-        
         super().__init__(
             code=code,
             message=message,
@@ -81,7 +75,7 @@ class ValidationException(AppException):
     def __init__(
         self,
         code: str = "VALIDATION_ERROR",
-        message: str = "입력 데이터가 유효하지 않습니다",
+        message: str = "Invalid input data",
         details: Optional[Dict[str, Any]] = None
     ):
         super().__init__(
@@ -95,7 +89,7 @@ class BadRequestException(AppException):
     def __init__(
         self,
         code: str = "BAD_REQUEST",
-        message: str = "잘못된 요청입니다",
+        message: str = "Bad request",
         details: Optional[Dict[str, Any]] = None
     ):
         super().__init__(

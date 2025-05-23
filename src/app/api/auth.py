@@ -6,7 +6,6 @@ from ..schema.auth import LoginRequest, LoginResponse, RefreshTokenResponse
 from ..core.uow import get_uow
 from ..db.unit_of_work import UnitOfWork
 from ..core.auth import get_refresh_token_from_cookie
-
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
@@ -20,7 +19,7 @@ async def login(
     return await auth_service.login(request, response)
 
 
-@router.get("/refresh", response_model=RefreshTokenResponse)
+@router.post("/refresh", response_model=RefreshTokenResponse)
 async def refresh(
     response: Response,
     uow: UnitOfWork = Depends(get_uow),

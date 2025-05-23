@@ -7,7 +7,6 @@ from ..core.auth import TokenData
 from ..service import CostService, QuoteService
 from ..schema.quote import CreateQuoteRequest, UpdateQuoteRequest, GetQuotesResponse, GetQuoteDetailsResponse
 from ..schema._common import BaseQuoteSchema
-
 from ..core.auth import required_authorization
 
 router = APIRouter(prefix="/quote", tags=["quote"])

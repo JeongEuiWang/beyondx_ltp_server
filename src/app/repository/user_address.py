@@ -10,16 +10,16 @@ class UserAddressRepository:
         self.db_session = db_session
 
     async def create_user_address(
-        self, user_id: int, address_data: CreateUserAddressRequest
+        self, user_id: int, request: CreateUserAddressRequest
     ) -> UserAddress:
         new_address = UserAddress(
-            name=address_data.name,
-            state=address_data.state,
-            county=address_data.county,
-            city=address_data.city,
-            zip_code=address_data.zip_code,
-            location_type=address_data.location_type,
-            address=address_data.address,
+            name=request.name,
+            state=request.state,
+            county=request.county,
+            city=request.city,
+            zip_code=request.zip_code,
+            location_type=request.location_type,
+            address=request.address,
             user_id=user_id
         )
         self.db_session.add(new_address)

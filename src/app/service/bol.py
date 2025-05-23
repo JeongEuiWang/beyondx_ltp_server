@@ -5,7 +5,7 @@ from reportlab.lib.units import inch
 from reportlab.lib import colors
 from datetime import datetime
 
-def create_structured_bill_of_lading(data, filename="structured_bill_of_lading.pdf"):
+async def create_structured_bill_of_lading(data, filename="structured_bill_of_lading.pdf"):
     doc = SimpleDocTemplate(filename, pagesize=letter,
                             leftMargin=0.5*inch, rightMargin=0.5*inch,
                             topMargin=0.5*inch, bottomMargin=0.5*inch)

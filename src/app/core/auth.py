@@ -32,30 +32,24 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> TokenData:
     )
 
     try:
-        # 토큰 디코딩
         payload = decode_token(token)
-
-        # 유저 ID와 사용자명 추출
         user_id = payload.get("sub")
         role_id = payload.get("role_id")
 
         if user_id is None or role_id is None:
             raise credentials_exception
 
-        # 숫자 형태의 user_id로 변환
         try:
             user_id = int(user_id)
         except (ValueError, TypeError):
             raise credentials_exception
 
-        # 토큰 데이터 반환
         return TokenData(user_id=user_id, role_id=role_id)
 
     except JWTError:
         raise credentials_exception
 
 
-# 인증을 필요로 하는 API 엔드포인트에서 사용할 의존성 함수
 async def required_authorization(
     token_data: TokenData = Depends(get_current_user),
 ) -> TokenData:

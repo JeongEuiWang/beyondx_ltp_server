@@ -14,7 +14,7 @@ class RateService:
     ) -> List[RateLocationResponse]:
         async with self.uow: # UoW 컨텍스트 사용
             # RateLocationRepository는 UoW에 self.rate_locations로 등록
-            locations = await self.uow.rate_locations.get_rate_location_by_query(
+            locations = await self.uow.rate_location.get_rate_location_by_query(
             region_id, city, zip_code
         )
         return [RateLocationResponse.model_validate(loc) for loc in locations]

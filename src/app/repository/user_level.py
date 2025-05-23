@@ -10,7 +10,7 @@ class UserLevelRepository:
     async def get_level_by_id(
         self,
         id: int,
-    ) -> UserLevel:
+    ) -> UserLevel | None:
         query = select(UserLevel).where(UserLevel.id == id)
         result = await self.db_session.execute(query)
         return result.scalar_one_or_none()

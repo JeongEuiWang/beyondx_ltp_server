@@ -17,15 +17,15 @@ class UserRepository:
         result = await self.db_session.execute(query)
         return result.scalar_one_or_none()
 
-    async def create_user(self, user_data: CreateUserRequest, hashed_password: str) -> User:
+    async def create_user(self, request: CreateUserRequest, hashed_password: str) -> User:
         default_role_id = 1
         default_user_level_id = 1
 
         new_user = User(
-            email=user_data.email,
-            first_name=user_data.first_name,
-            last_name=user_data.last_name,
-            phone=user_data.phone,
+            email=request.email,
+            first_name=request.first_name,
+            last_name=request.last_name,
+            phone=request.phone,
             password=hashed_password,
             role_id=default_role_id,
             user_level_id=default_user_level_id,

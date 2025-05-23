@@ -38,10 +38,10 @@ class CostService:
                     cargo.weight, cargo.quantity, cargo.width, cargo.height, cargo.length
                 )
 
-            from_location_area = await self.uow.rate_areas.get_area_by_zip_code(
+            from_location_area = await self.uow.rate_area.get_area_by_zip_code(
                 from_location.zip_code
             )
-            to_location_area = await self.uow.rate_areas.get_area_by_zip_code(
+            to_location_area = await self.uow.rate_area.get_area_by_zip_code(
                 to_location.zip_code
             )
 
@@ -55,7 +55,7 @@ class CostService:
             )
             base_area_id = base_area.id
 
-            area_costs = await self.uow.rate_area_costs.get_area_costs(base_area_id)
+            area_costs = await self.uow.rate_area_cost.get_area_costs(base_area_id)
             
             builder.set_location_rate(
                 min_load=base_area.min_load,
@@ -102,11 +102,11 @@ class CostService:
     ) -> DiscountCostSchema:
         builder = DiscountBuilder(total_cost=total_cost)
         async with self.uow:
-            user = await self.uow.users.get_user_by_id(user_id)
+            user = await self.uow.user.get_user_by_id(user_id)
             if user is None:
                 raise NotFoundException(message=f"사용자 ID {user_id}를 찾을 수 없습니다.")
 
-            user_level = await self.uow.user_levels.get_level_by_id(
+            user_level = await self.uow.user_level.get_level_by_id(
                 user.user_level_id
             )
             if user_level is None:

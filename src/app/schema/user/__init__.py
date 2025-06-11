@@ -1,6 +1,7 @@
 from .request import (
     CreateUserRequest,
     CreateUserAddressRequest,
+    UpdateUserAddressRequest,
 )
 from .response import (
     CheckEmailResponse,
@@ -8,6 +9,8 @@ from .response import (
     GetUserInfoResponse,
     CreateUserAddressResponse,
     GetUserAddressResponse,
+    UpdateUserAddressResponse,
+    DeleteUserAddressResponse,
 )
 
 __all__ = [
@@ -18,4 +21,7 @@ __all__ = [
     "CreateUserAddressRequest",
     "CreateUserAddressResponse",
     "GetUserAddressResponse",
+    "UpdateUserAddressRequest",
+    "UpdateUserAddressResponse",
+    "DeleteUserAddressResponse",
 ]

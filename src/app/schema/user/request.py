@@ -12,3 +12,7 @@ class CreateUserRequest(BaseSchema):
 
 class CreateUserAddressRequest(BaseUserAddressSchema):
     pass
+
+
+class UpdateUserAddressRequest(BaseUserAddressSchema):
+    pass

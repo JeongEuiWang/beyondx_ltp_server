@@ -12,7 +12,6 @@ from app.db.base import Base
 from app.model._mixin import AutoIntegerIdMixin, TimestampMixin
 
 
-# Local Rate의 기준이 되는 지역
 class RateRegion(AutoIntegerIdMixin, TimestampMixin, Base):
     __tablename__ = "rate_region"
 
@@ -23,8 +22,6 @@ class RateRegion(AutoIntegerIdMixin, TimestampMixin, Base):
     rate_location = relationship("RateLocation", back_populates="rate_region")
 
 
-# Region 기준으로 구분되는 Area의 종류
-# 동일한 이름을 가지더라도 region_id에 따라 Unique로 설정된다.
 class RateArea(AutoIntegerIdMixin, TimestampMixin, Base):
     __tablename__ = "rate_area"
 

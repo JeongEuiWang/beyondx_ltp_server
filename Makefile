@@ -1,20 +1,20 @@
 POETRY_VERSION=2.1.1
 
 .PHONY: clean
-clean: ## Remove all caches and other files:
+clean:
 	rm -r -f .pytest_cache
 	rm -f .coverage
 
 .PHONY: build
-build: ## Create vevn 
+build:
 	python3 -m poetry install
 
 .PHONY: package
-package: ## Create whl packages
+package:
 	python3 -m poetry build --format=wheel
 
 .PHONY: pre 
-pre: ## Installs or upgrades environment dependencies like Poetry
+pre:
 	python3 -m pip install poetry==$(POETRY_VERSION) setuptools
 
 .PHONY: dev prod
@@ -38,15 +38,15 @@ reset-dev:
 reset-prod: 
 	ENV=prod poetry run alembic downgrade base
 
-## Ryns clean, build, and package
+
 .PHONY: ci
 ci: clean build package
 
-# Run tests
+
 .PHONY: test 
 test:
 	pytest -q
 
-.PHONY: help ## Prints help for targets with comments
+.PHONY: help
 help: 
-	@cat $(MAKEFILE_LIST) | grep -E '^[a-zA-Z_-]+:.*?## .*$$' | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+	@cat $(MAKEFILE_LIST) | grep -E '^[a-zA-Z_-]+:.*?

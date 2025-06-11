@@ -28,3 +28,4 @@ class GetQuotesLocationSchema(IntegerIDSchema, BaseSchema):
 class GetQuotesResponse(BaseQuoteSchema):
     from_location: GetQuotesLocationSchema
     to_location: GetQuotesLocationSchema
+    cargo: List[QuoteCargoWithIDSchema]

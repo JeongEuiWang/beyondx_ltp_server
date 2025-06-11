@@ -48,6 +48,5 @@ app.add_middleware(
 )
 
 
-# API 라우터 등록
 app.include_router(api_router, prefix="/api")
 setup_exception_handlers(app)

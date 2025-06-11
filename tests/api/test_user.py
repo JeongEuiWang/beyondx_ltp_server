@@ -37,7 +37,6 @@ class TestUserRegister:
     @pytest.mark.asyncio
     async def test_check_email_unavailable(self, client: AsyncClient):
         """이미 사용 중인 이메일 확인 테스트"""
-        # 먼저 회원가입으로 사용자 생성
         user_data = {
             "email": "taken@example.com",
             "password": "StrongPassword123!",
@@ -47,16 +46,13 @@ class TestUserRegister:
         }
         await client.post("/api/user/sign-up", json=user_data)
     
-        # 이미 가입된 이메일로 확인 요청
         response = await client.get("/api/user/check-email?email=taken@example.com")
     
-        # API 응답이 422로 변경됨
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
     @pytest.mark.asyncio
     async def test_get_user_info(self, client: AsyncClient):
         """사용자 정보 조회 테스트"""
-        # 먼저 회원가입
         user_data = {
             "email": "unique_info_test@example.com",
             "password": "StrongPassword123!",
@@ -67,7 +63,6 @@ class TestUserRegister:
         sign_up_response = await client.post("/api/user/sign-up", json=user_data)
         assert sign_up_response.status_code == 200
 
-        # 로그인하여 토큰 획득
         login_data = {
             "email": "unique_info_test@example.com",
             "password": "StrongPassword123!",
@@ -76,7 +71,6 @@ class TestUserRegister:
         assert login_response.status_code == 200
         access_token = login_response.json()["access"]["token"]
         
-        # 사용자 정보 조회
         response = await client.get(
             "/api/user/me",
             headers={"Authorization": f"Bearer {access_token}"}
@@ -85,10 +79,8 @@ class TestUserRegister:
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
         
-        # 응답 내용 출력하여 확인
         print(f"Response data: {data}")
         
-        # 응답에 필요한 필드들이 있는지 확인
         assert "id" in data
         assert "email" in data
         assert "first_name" in data
@@ -97,13 +89,11 @@ class TestUserRegister:
         assert "total_payment_amount" in data
         assert "user_level" in data
         
-        # user_level 객체 확인
         assert "id" in data["user_level"]
         assert "level" in data["user_level"]
         assert "required_amount" in data["user_level"]
         assert "discount_rate" in data["user_level"]
         
-        # 가입한 사용자 정보가 올바른지 확인
         assert data["email"] == user_data["email"]
         assert data["first_name"] == user_data["first_name"]
         assert data["last_name"] == user_data["last_name"]

@@ -9,17 +9,14 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
 
-# 모델 임포트를 위한 경로 추가
 sys.path.append(str(pathlib.Path(__file__).resolve().parents[3]))
 
-# SQLAlchemy 모델 임포트
 from app.db.base import Base
 from app.model.user import User, UserLevel, UserAddress, Role
 from app.model.cargo import CargoTransportation, CargoAccessorial, CargoPackage
 from app.model.rate import RateArea, RateRegion, RateLocation
 from app.model.quote import Quote, QuoteLocation, QuoteLocationAccessorial
 
-# 모든 모델 임포트
 
 from app.core.config import get_settings
 
@@ -28,7 +25,6 @@ SETTINGS = get_settings()
 config = context.config
 fileConfig(config.config_file_name)
 
-# SQLAlchemy 메타데이터 연결
 target_metadata = Base.metadata
 
 config.set_main_option("sqlalchemy.url", str(SETTINGS.DB_URL))

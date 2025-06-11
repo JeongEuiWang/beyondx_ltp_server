@@ -1,6 +1,5 @@
 from passlib.context import CryptContext
 
-# 비밀번호 해싱을 위한 객체
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 

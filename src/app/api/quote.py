@@ -1,11 +1,18 @@
-from fastapi import APIRouter, status, Path, Depends
+from fastapi import APIRouter, Query, status, Path, Depends, Request
+from typing import List, Optional
 
 from ..core.exceptions import BadRequestException, NotFoundException
 from ..core.uow import get_uow
 from ..db.unit_of_work import UnitOfWork
 from ..core.auth import TokenData
 from ..service import CostService, QuoteService
-from ..schema.quote import CreateQuoteRequest, UpdateQuoteRequest, GetQuotesResponse, GetQuoteDetailsResponse
+from ..schema.quote import (
+    CreateQuoteRequest,
+    UpdateQuoteRequest,
+    GetQuotesResponse,
+    GetQuoteDetailsResponse,
+    ConfirmQuoteRequest,
+)
 from ..schema._common import BaseQuoteSchema
 from ..core.auth import required_authorization
 
@@ -26,6 +33,46 @@ async def get_quotes(
 
 
 @router.get(
+    "/admin",
+    response_model=list[GetQuotesResponse],
+    status_code=status.HTTP_200_OK,
+)
+async def get_quotes_admin(
+    request: Request,
+    uow: UnitOfWork = Depends(get_uow),
+    token_data: TokenData = Depends(required_authorization),
+):
+    status_values = []
+    query_params = request.query_params
+    
+    for key, value in query_params.items():
+        if key.startswith('status[') and key.endswith(']'):
+            status_values.append(value)
+        elif key == 'status':
+            if isinstance(query_params.getlist('status'), list):
+                status_values.extend(query_params.getlist('status'))
+            else:
+                status_values.append(value)
+    
+    quote_service = QuoteService(uow)
+    return await quote_service.get_quotes_admin(token_data.role_id, status_values)
+
+
+@router.get(
+    "/admin/{quote_id}",
+    response_model=list[GetQuotesResponse],
+    status_code=status.HTTP_200_OK,
+)
+async def get_quote_details_admin(
+    uow: UnitOfWork = Depends(get_uow),
+    quote_id: str = Path(..., description="Quote ID"),
+    token_data: TokenData = Depends(required_authorization),
+):
+    quote_service = QuoteService(uow)
+    return await quote_service.get_quote_by_id(quote_id, token_data)
+
+
+@router.get(
     "/{quote_id}",
     response_model=GetQuoteDetailsResponse,
     status_code=status.HTTP_200_OK,
@@ -36,7 +83,7 @@ async def get_quote_details(
     token_data: TokenData = Depends(required_authorization),
 ):
     quote_service = QuoteService(uow)
-    return await quote_service.get_quote_by_id(quote_id, token_data.user_id)
+    return await quote_service.get_quote_by_id(quote_id, token_data)
 
 
 @router.post(
@@ -138,10 +185,25 @@ async def update_quote(
     status_code=status.HTTP_200_OK,
     response_model=GetQuoteDetailsResponse,
 )
-async def api_submit_quote(
+async def submit_quote(
     uow: UnitOfWork = Depends(get_uow),
     token_data: TokenData = Depends(required_authorization),
     quote_id: str = Path(..., description="인용 ID"),
 ):
     quote_service = QuoteService(uow)
-    return await quote_service.submit_quote(quote_id, token_data.user_id)
+    return await quote_service.submit_quote(quote_id, token_data.user_id, token_data)
+
+
+@router.post(
+    "/{quote_id}/confirm",
+    status_code=status.HTTP_200_OK,
+    response_model=GetQuoteDetailsResponse,
+)
+async def confirm_quote(
+    request: ConfirmQuoteRequest,
+    uow: UnitOfWork = Depends(get_uow),
+    token_data: TokenData = Depends(required_authorization),
+    quote_id: str = Path(..., description="인용 ID"),
+):
+    quote_service = QuoteService(uow)
+    return await quote_service.confirm_quote(quote_id, token_data.role_id, request, token_data)

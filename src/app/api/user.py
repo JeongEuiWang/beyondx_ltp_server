@@ -14,6 +14,9 @@ from ..schema.user import (
     CreateUserAddressRequest,
     CreateUserAddressResponse,
     GetUserAddressResponse,
+    UpdateUserAddressRequest,
+    UpdateUserAddressResponse,
+    DeleteUserAddressResponse,
 )
 from ..core.auth import required_authorization
 
@@ -72,3 +75,34 @@ async def get_user_address(
 ):
     user_service = UserService(uow)
     return await user_service.get_user_addresses(token_data.user_id)
+
+
+@router.put(
+    "/address/{address_id}",
+    response_model=UpdateUserAddressResponse,
+    status_code=status.HTTP_200_OK,
+)
+async def update_user_address(
+    address_id: int,
+    request: UpdateUserAddressRequest,
+    token_data: TokenData = Depends(required_authorization),
+    uow: UnitOfWork = Depends(get_uow),
+):
+    user_service = UserService(uow)
+    return await user_service.update_user_address(
+        token_data.user_id, address_id, request=request
+    )
+
+
+@router.delete(
+    "/address/{address_id}",
+    response_model=DeleteUserAddressResponse,
+    status_code=status.HTTP_200_OK,
+)
+async def delete_user_address(
+    address_id: int,
+    token_data: TokenData = Depends(required_authorization),
+    uow: UnitOfWork = Depends(get_uow),
+):
+    user_service = UserService(uow)
+    return await user_service.delete_user_address(token_data.user_id, address_id)

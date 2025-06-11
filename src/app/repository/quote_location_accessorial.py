@@ -37,7 +37,6 @@ class QuoteLocationAccessorialRepository:
         quote_location_id: int,
         accessorial_schemas: List[QuoteLocationAccessorialSchema],
     ) -> List[QuoteLocationAccessorial]:
-        """인용 위치 부가 서비스를 생성합니다."""
         new_accessorial_models = [
             QuoteLocationAccessorial(
                 quote_location_id=quote_location_id,
@@ -50,7 +49,6 @@ class QuoteLocationAccessorialRepository:
         return new_accessorial_models
       
     async def delete_quote_location_accessorial(self, quote_location_id: int):
-        """인용 위치 부가 서비스를 모두 삭제합니다."""
         await self.db_session.execute(
             delete(QuoteLocationAccessorial).where(
                 QuoteLocationAccessorial.quote_location_id == quote_location_id
@@ -61,7 +59,6 @@ class QuoteLocationAccessorialRepository:
     async def delete_specific_accessorials(
         self, quote_location_id: int, cargo_accessorial_ids: List[int]
     ):
-        """특정 인용 위치에서 지정된 부가 서비스만 삭제합니다."""
         if not cargo_accessorial_ids:
             return
 

@@ -17,6 +17,7 @@ class BaseUserSchema(BaseSchema):
     last_name: str
     phone: str
     total_payment_amount: float
+    role_id: int
     user_level: BaseUserLevelSchema
 
 
@@ -62,6 +63,7 @@ class BaseQuoteSchema(StringIDSchema, BaseSchema):
     order_status: OrderStatusEnum
     order_primary: str | None
     order_additional_request: str | None
+    created_at: datetime
 
 
 class QuoteLocationAccessorialSchema(BaseSchema):

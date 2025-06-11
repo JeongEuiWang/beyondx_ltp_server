@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Query, Depends, status, Path
+from fastapi import APIRouter, Query, Depends, status
 from typing import Optional, List
 from ..schema.rate import RateLocationResponse
 from ..service import RateService
@@ -9,13 +9,13 @@ router = APIRouter(prefix="/rate", tags=["rate"])
 
 
 @router.get(
-    "/location/{region_id}",
+    "/location",
     response_model=List[RateLocationResponse],
     status_code=status.HTTP_200_OK,
 )
 async def get_locations_by_city_or_zip_code(
     uow: UnitOfWork = Depends(get_uow),
-    region_id: int = Path(..., description="지역 ID"),
+    region_id: int = Query(..., description="지역 ID"),
     city: Optional[str] = Query(None, description="도시명"),
     zip_code: Optional[str] = Query(None, description="우편번호"),
 ):

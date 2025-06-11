@@ -1,4 +1,4 @@
-from .request import CreateQuoteRequest, UpdateQuoteRequest
+from .request import CreateQuoteRequest, UpdateQuoteRequest, ConfirmQuoteRequest
 from .response import GetQuoteDetailsResponse, GetQuotesResponse
 
 __all__ = [
@@ -6,4 +6,5 @@ __all__ = [
     "UpdateQuoteRequest",
     "GetQuoteDetailsResponse",
     "GetQuotesResponse",
+    "ConfirmQuoteRequest",
 ]

@@ -2,7 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from typing import List
 
-from app.model.cargo import CargoTransportation, CargoAccessorial
+from app.model.cargo import CargoTransportation, CargoAccessorial, CargoPackage
 
 
 class CargoRepository:
@@ -20,5 +20,12 @@ class CargoRepository:
         self,
     ) -> List[CargoAccessorial]:
         query = select(CargoAccessorial)
+        result = await self.db_session.execute(query)
+        return result.scalars().all()
+    
+    async def get_cargo_package(
+        self,
+    ) -> List[CargoPackage]:
+        query = select(CargoPackage)
         result = await self.db_session.execute(query)
         return result.scalars().all()

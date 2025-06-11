@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, update
 from ..model.user import User
 from ..schema.user import CreateUserRequest
 
@@ -34,3 +34,12 @@ class UserRepository:
         await self.db_session.flush()
 
         return new_user
+    
+    async def update_user_total_amount(self, user_id: int, total_amount: float):
+
+        await self.db_session.execute(
+            update(User)
+            .where(User.id == user_id)
+            .values(total_payment_amount=User.total_payment_amount + total_amount)
+        )
+        await self.db_session.flush()

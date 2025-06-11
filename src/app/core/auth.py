@@ -6,7 +6,6 @@ from typing import Optional
 from ..core.exceptions import AuthException
 from .jwt import decode_token
 
-# 토큰 URL 설정 (로그인 엔드포인트)
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
 
@@ -16,7 +15,6 @@ class TokenData:
         self.role_id = role_id
 
 
-# 쿠키에서 refresh token 읽기
 async def get_refresh_token_from_cookie(
     refresh_token: Optional[str] = Cookie(None, alias="ltp_refresh_token")
 ) -> Optional[str]:
@@ -24,9 +22,6 @@ async def get_refresh_token_from_cookie(
 
 
 async def get_current_user(token: str = Depends(oauth2_scheme)) -> TokenData:
-    """
-    현재 요청의 토큰을 검증하고 유저 정보를 반환합니다.
-    """
     credentials_exception = AuthException(
         message="유효하지 않은 인증 정보입니다.",
     )

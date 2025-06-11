@@ -14,7 +14,6 @@ import sqlalchemy as sa
 from app.model._enum import UserLevelEnum, RoleEnum
 
 
-# revision identifiers, used by Alembic.
 revision: str = "c59e1eca1b0b"
 down_revision: Union[str, None] = "9bc0e72ea289"
 branch_labels: Union[str, Sequence[str], None] = None

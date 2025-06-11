@@ -7,10 +7,8 @@ from ...schema.cost import BaseCostSchema, LocationCostSchema
 
 
 class LocationCostBuilder:
-    # 위치 유형별 비용 상수
     RESIDENTIAL_COST = Decimal(25)
 
-    # 공항 픽업/배송 비용 설정
     AIRPORT_CONFIG = {
         "PICK_UP": {
             "min_cost": Decimal(30),
@@ -52,7 +50,6 @@ class LocationCostBuilder:
 
         cost_with_weight = price_per_weight * self._base_cost.freight_weight
 
-        # 여기 이상함, 최대 금액을 넘는다는게 화물 무게 최대치를 의미하는게 아닌지 확인 필요
         if cost_with_weight > max_cost:
             return max_cost
         elif cost_with_weight < min_cost:

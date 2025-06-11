@@ -15,7 +15,7 @@ class BaseCostBuilder:
     def __init__(self, fsc: Decimal):
         self._freight_weight = Decimal(
             "0"
-        )  # 최종 운임 무게, 각 Cargo마다 무게 / 부피 무게 비교 후 큰값 사용
+        )
         self._min_load = Decimal("0")
         self._max_load = Decimal("0")
         self._max_load_weight = Decimal("0")
@@ -25,7 +25,6 @@ class BaseCostBuilder:
         self._fsc = fsc
         self._final_cost = Decimal("0")
 
-    # 운임 무게 계산, 각 cargo마다 실행하여 총 freight_weight 계산
     def set_freight_weight(
         self, weight: float, quantity: int, width: float, height: float, length: float
     ) -> "BaseCostBuilder":
@@ -42,7 +41,6 @@ class BaseCostBuilder:
     ) -> Decimal:
         return round_up_decimal(Decimal(width * height * length / 166))
 
-    # 지역 요율 계산, Area 확정은 Service 레이어에서 결정
     def set_location_rate(
         self,
         min_load: Decimal,

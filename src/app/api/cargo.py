@@ -1,6 +1,6 @@
 from fastapi import APIRouter, status, Depends
 from typing import List
-from ..schema.cargo import CargoTransportationResponse, CargoAccessorialResponse
+from ..schema.cargo import CargoTransportationResponse, CargoAccessorialResponse, CargoPackageResponse
 from ..service import CargoService
 from ..core.uow import get_uow
 from ..db.unit_of_work import UnitOfWork
@@ -30,3 +30,15 @@ async def get_cargo_accessorial(
 ):
     cargo_service = CargoService(uow)
     return await cargo_service.get_cargo_accessorial()
+
+
+@router.get(
+    "/package",
+    response_model=List[CargoPackageResponse],
+    status_code=status.HTTP_200_OK,
+)
+async def get_cargo_package(
+    uow: UnitOfWork = Depends(get_uow),
+):
+    cargo_service = CargoService(uow)
+    return await cargo_service.get_cargo_package()

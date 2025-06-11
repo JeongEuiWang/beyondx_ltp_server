@@ -46,3 +46,18 @@ class GetUserAddressResponse(IntegerIDSchema):
     zip_code: str
     location_type: LocationTypeEnum
     address: str
+
+
+class UpdateUserAddressResponse(IntegerIDSchema):
+    user_id: int
+    name: str
+    state: str
+    city: str
+    county: str
+    zip_code: str
+    location_type: LocationTypeEnum
+    address: str
+
+
+class DeleteUserAddressResponse(BaseSchema):
+    success: bool

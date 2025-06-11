@@ -3,22 +3,18 @@ from typing import Literal, Optional
 import os
 import secrets
 
-# 환경 모드 상수 정의
 ENV_MODE = Literal["dev", "prod"]
 DEFAULT_MODE: ENV_MODE = "dev"
 
 
 class Settings(BaseSettings):
-    # JWT 관련 설정
     SECRET_KEY: str = secrets.token_urlsafe(32)
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24  # 24시간
-    REFRESH_TOKEN_EXPIRE_DAYS: int = 30  # 30일
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 30
 
-    # 쿠키 설정
-    COOKIE_SECURE: bool = False  # HTTPS만 허용 여부
+    COOKIE_SECURE: bool = False
 
-    # 데이터베이스 관련 설정
     DATABASE_URL: Optional[str] = None
 
     DB_HOST: str
@@ -44,14 +40,14 @@ class Settings(BaseSettings):
 
 
 class DevSettings(Settings):
-    COOKIE_SECURE: bool = False  # 개발 환경에서는 HTTP 허용
+    COOKIE_SECURE: bool = False
 
     class Config:
         env_file = ".env.dev"
 
 
 class ProdSettings(Settings):
-    COOKIE_SECURE: bool = True  # 프로덕션 환경에서는 HTTPS만 허용
+    COOKIE_SECURE: bool = True
 
     class Config:
         env_file = ".env.prod"

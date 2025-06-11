@@ -14,7 +14,6 @@ class TestUserAddressAPI:
     @pytest.mark.asyncio
     async def test_create_user_address(self, client: AsyncClient):
         """사용자 주소 등록 테스트"""
-        # 먼저 회원가입
         user_data = {
             "email": "address_test@example.com",
             "password": "StrongPassword123!",
@@ -24,7 +23,6 @@ class TestUserAddressAPI:
         }
         await client.post("/api/user/sign-up", json=user_data)
 
-        # 로그인하여 토큰 획득
         login_data = {
             "email": "address_test@example.com",
             "password": "StrongPassword123!",
@@ -32,7 +30,6 @@ class TestUserAddressAPI:
         login_response = await client.post("/api/auth/login", json=login_data)
         access_token = login_response.json()["access"]["token"]
 
-        # 주소 등록 데이터
         address_data = {
             "name": "회사",
             "state": "서울특별시",
@@ -43,7 +40,6 @@ class TestUserAddressAPI:
             "address": "테헤란로 123"
         }
 
-        # 주소 등록 요청
         response = await client.post(
             "/api/user/address",
             json=address_data,
@@ -65,7 +61,6 @@ class TestUserAddressAPI:
     @pytest.mark.asyncio
     async def test_get_user_addresses(self, client: AsyncClient):
         """사용자 주소 목록 조회 테스트"""
-        # 먼저 회원가입
         user_data = {
             "email": "address_list_test@example.com",
             "password": "StrongPassword123!",
@@ -75,7 +70,6 @@ class TestUserAddressAPI:
         }
         await client.post("/api/user/sign-up", json=user_data)
 
-        # 로그인하여 토큰 획득
         login_data = {
             "email": "address_list_test@example.com",
             "password": "StrongPassword123!",
@@ -83,7 +77,6 @@ class TestUserAddressAPI:
         login_response = await client.post("/api/auth/login", json=login_data)
         access_token = login_response.json()["access"]["token"]
 
-        # 주소 등록 데이터
         address_data = {
             "name": "집",
             "state": "서울특별시",
@@ -94,14 +87,12 @@ class TestUserAddressAPI:
             "address": "올림픽로 456"
         }
 
-        # 주소 등록
         await client.post(
             "/api/user/address",
             json=address_data,
             headers={"Authorization": f"Bearer {access_token}"}
         )
 
-        # 주소 목록 조회
         response = await client.get(
             "/api/user/address",
             headers={"Authorization": f"Bearer {access_token}"}
@@ -111,10 +102,8 @@ class TestUserAddressAPI:
         data = response.json()
         assert isinstance(data, list)
         
-        # 최소한 하나의 주소가 있는지 확인
         assert len(data) >= 1
         
-        # 주소 데이터 형식 확인
         assert "id" in data[0]
         assert "name" in data[0]
         assert "state" in data[0]

@@ -37,7 +37,7 @@ class UserAddress(AutoIntegerIdMixin, TimestampMixin, Base):
     __tablename__ = "user_address"
 
     user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
-    name = Column(String(255), nullable=False) # 주소 별칭
+    name = Column(String(255), nullable=False)
     state = Column(String(255), nullable=False)
     county = Column(String(255), nullable=False)
     city = Column(String(255), nullable=False)

@@ -8,6 +8,9 @@ from ..schema.user import (
     CreateUserAddressRequest,
     CreateUserAddressResponse,
     GetUserAddressResponse,
+    UpdateUserAddressRequest,
+    UpdateUserAddressResponse,
+    DeleteUserAddressResponse,
 )
 from ..core.security import get_password_hash
 from ..core.exceptions import (
@@ -91,3 +94,39 @@ class UserService:
             return [
                 GetUserAddressResponse.model_validate(addr) for addr in addresses_models
             ]
+
+    async def update_user_address(
+        self, user_id: int, address_id: int, request: UpdateUserAddressRequest
+    ) -> UpdateUserAddressResponse:
+        async with self.uow:
+            address = await self.uow.user_address.get_user_address_by_id(address_id)
+            if not address:
+                raise NotFoundException(message="Address not found")
+            
+            if address.user_id != user_id:
+                raise BadRequestException(message="Access denied: This address does not belong to the user")
+            
+            updated_address = await self.uow.user_address.update_user_address(
+                address_id, request
+            )
+            if not updated_address:
+                raise NotFoundException(message="Failed to update address")
+            
+            return UpdateUserAddressResponse.model_validate(updated_address)
+
+    async def delete_user_address(
+        self, user_id: int, address_id: int
+    ) -> DeleteUserAddressResponse:
+        async with self.uow:
+            address = await self.uow.user_address.get_user_address_by_id(address_id)
+            if not address:
+                raise NotFoundException(message="Address not found")
+            
+            if address.user_id != user_id:
+                raise BadRequestException(message="Access denied: This address does not belong to the user")
+            
+            success = await self.uow.user_address.delete_user_address(address_id)
+            if not success:
+                raise NotFoundException(message="Failed to delete address")
+            
+            return DeleteUserAddressResponse(success=True)

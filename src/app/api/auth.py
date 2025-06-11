@@ -1,11 +1,11 @@
-from fastapi import APIRouter, Response, Depends
+from fastapi import APIRouter, Response, Depends, status
 from ..service import AuthService
 from ..core.jwt import decode_token
 from ..core.exceptions import AuthException
-from ..schema.auth import LoginRequest, LoginResponse, RefreshTokenResponse
+from ..schema.auth import LoginRequest, LoginResponse, RefreshTokenResponse, LogoutResponse
 from ..core.uow import get_uow
 from ..db.unit_of_work import UnitOfWork
-from ..core.auth import get_refresh_token_from_cookie
+from ..core.auth import get_refresh_token_from_cookie, required_authorization, TokenData
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
@@ -37,3 +37,12 @@ async def refresh(
         return await auth_service.refresh_token(user_id, role_id, response)
     except Exception:
         raise AuthException(message="유효하지 않은 접근입니다.")
+
+
+@router.post("/logout", response_model=LogoutResponse, status_code=status.HTTP_200_OK)
+async def logout(
+    response: Response,
+    uow: UnitOfWork = Depends(get_uow),
+):
+    auth_service = AuthService(uow)
+    return await auth_service.logout(response)

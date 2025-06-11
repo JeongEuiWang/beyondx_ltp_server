@@ -1,4 +1,3 @@
-# src/app/core/exceptions.py
 from typing import Any, Dict, Optional, Union
 from fastapi import status
 from pydantic import BaseModel

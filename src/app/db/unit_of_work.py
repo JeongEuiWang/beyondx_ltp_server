@@ -1,6 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
-# 각 리포지토리 import
 from ..repository import (
     UserRepository,
     UserLevelRepository,
@@ -56,6 +55,6 @@ class UnitOfWork:
         else:
             try:
                 await self._session.commit()
-            except Exception:  # 커밋 중 발생할 수 있는 예외 (예: DB 연결 끊김)
+            except Exception:
                 await self._session.rollback()
                 raise

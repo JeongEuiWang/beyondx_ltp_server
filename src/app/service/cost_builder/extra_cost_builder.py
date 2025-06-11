@@ -48,14 +48,12 @@ class ExtraCostBuilder:
         return self
 
     def _check_weekend_cost(self, request_datetime: datetime) -> Decimal:
-        # 주말 확인 (토요일 또는 일요일)
-        if request_datetime.weekday() >= 5:  # 5: 토요일, 6: 일요일
+        if request_datetime.weekday() >= 5:
             return Decimal(100)
         else:
             return Decimal(0)
 
     def _check_after_hour_cost(self, request_datetime: datetime) -> Decimal:
-        # 17시 이후인 경우 (After Hour)
         if request_datetime.hour >= 17:
             return Decimal(100)
         else:
@@ -64,7 +62,6 @@ class ExtraCostBuilder:
     def _check_priority_with_date(
         self, is_priority: bool, request_datetime: datetime
     ) -> Decimal:
-        # is_priority이고 업무 시간(9-17시)인 경우
         if is_priority and (9 <= request_datetime.hour < 17):
             return Decimal(100)
         else:

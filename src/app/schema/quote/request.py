@@ -17,3 +17,7 @@ class UpdateQuoteRequest(BaseSchema):
     from_location: QuoteLocationSchema
     to_location: QuoteLocationSchema
     cargo: List[QuoteCargoSchema]
+
+
+class ConfirmQuoteRequest(BaseSchema):
+    actual_price: float

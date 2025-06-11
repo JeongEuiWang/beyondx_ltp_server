@@ -14,7 +14,6 @@ import sqlalchemy as sa
 from pathlib import Path
 
 
-# revision identifiers, used by Alembic.
 revision: str = "80eb89b88ed6"
 down_revision: Union[str, None] = "c59e1eca1b0b"
 branch_labels: Union[str, Sequence[str], None] = None
@@ -41,7 +40,6 @@ AREA_MAP = {
 }
 
 
-# Insert Region:: Texas
 def insert_region() -> None:
     rate_region_table = sa.table(
         "rate_region",
@@ -222,7 +220,7 @@ def extract_location(file_path: Path) -> list[dict]:
                         temp_row_dict["area_id"] = AREA_MAP[value]
                     else:
                         temp_row_dict["area_id"] = None
-            temp_row_dict["region_id"] = 1  # Texas Region Id
+            temp_row_dict["region_id"] = 1
             temp_row_dict["created_at"] = datetime.now(UTC).strftime(
                 "%Y-%m-%d %H:%M:%S"
             )

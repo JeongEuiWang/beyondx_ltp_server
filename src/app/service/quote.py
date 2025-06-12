@@ -556,7 +556,7 @@ class QuoteService:
 
                 email_service = EmailSender(
                     subject=f"Load {order_primary} Order Received",
-                    receiver_email="wang323@naver.com",
+                    receiver_email=user_model.email,
                     client_name=f"{user_model.first_name} {user_model.last_name}",
                     quote_id=quote_model.id,
                     order_primary=order_primary,

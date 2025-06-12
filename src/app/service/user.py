@@ -44,8 +44,15 @@ class UserService:
             if existing_user:
                 raise BadRequestException(message="Email already exists")
             hashed_password = get_password_hash(request.password)
-            await self.uow.user.create_user(request, hashed_password)
-            return CreateUserResponse(success=True)
+            new_user = await self.uow.user.create_user(request, hashed_password)
+            user_dict = {
+                "id": new_user.id,
+                "email": new_user.email,
+                "first_name": new_user.first_name,
+                "last_name": new_user.last_name,
+                "phone": new_user.phone,
+            }
+            return CreateUserResponse.model_validate(user_dict)
 
     async def get_user_info(self, user_id: int) -> GetUserInfoResponse:
         async with self.uow:

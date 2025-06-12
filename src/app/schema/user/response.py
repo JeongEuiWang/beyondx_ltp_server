@@ -14,7 +14,11 @@ class CheckEmailResponse(BaseSchema):
 
 
 class CreateUserResponse(BaseSchema):
-    success: bool
+    id: int
+    email: EmailStr
+    first_name: str
+    last_name: str
+    phone: str
 
 
 class GetUserInfoResponse(IntegerIDSchema):

@@ -7,8 +7,6 @@ import calendar
 from fastapi import HTTPException, Depends
 from app.core.auth import TokenData, required_authorization
 
-from app.service.bol import create_structured_bill_of_lading
-import os
 from ..db.unit_of_work import UnitOfWork
 from ..model.quote import Quote
 from ..model.quote import QuoteLocation

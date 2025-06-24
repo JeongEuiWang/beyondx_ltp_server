@@ -10,6 +10,7 @@ class ExtraCostBuilder:
     def __init__(self, base_cost: BaseCostSchema):
         self._base_cost = base_cost
         self._final_cost = Decimal(0)
+        self._priority_cost_added = False
 
     def calculate_accesserial(
         self, location: QuoteLocationSchema
@@ -62,7 +63,16 @@ class ExtraCostBuilder:
     def _check_priority_with_date(
         self, is_priority: bool, request_datetime: datetime
     ) -> Decimal:
-        if is_priority and (9 <= request_datetime.hour < 17):
+        is_weekday = request_datetime.weekday() < 5
+        is_business_hours = 9 <= request_datetime.hour < 17
+
+        if (
+            is_priority
+            and is_weekday
+            and is_business_hours
+            and not self._priority_cost_added
+        ):
+            self._priority_cost_added = True
             return Decimal(100)
         else:
             return Decimal(0)

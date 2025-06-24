@@ -28,18 +28,20 @@ class BaseCostBuilder:
     def set_freight_weight(
         self, weight: float, quantity: int, width: float, height: float, length: float
     ) -> "BaseCostBuilder":
-        volume_weight = self._calculate_volume_weight(width, height, length)
+        volume_weight = self._calculate_volume_weight(
+            width, height, length, quantity
+        )
         package_weight = self._calculate_package_weight(weight, quantity)
-        self._freight_weight = max(package_weight, volume_weight)
+        self._freight_weight += max(package_weight, volume_weight)
         return self
 
     def _calculate_package_weight(self, weight: float, quantity: int) -> Decimal:
         return round_up_decimal(Decimal(weight * quantity))
 
     def _calculate_volume_weight(
-        self, width: float, height: float, length: float
+        self, width: float, height: float, length: float, quantity: int
     ) -> Decimal:
-        return round_up_decimal(Decimal(width * height * length / 166))
+        return round_up_decimal(Decimal(width * height * length * quantity / 166))
 
     def set_location_rate(
         self,
@@ -55,7 +57,8 @@ class BaseCostBuilder:
     def set_price_per_weight(self, rate_costs: List[RateCost]) -> "BaseCostBuilder":
         if self._freight_weight > self._max_load_weight:
             raise Exception(
-                "최대 운임 무게를 초과했습니다. 고객사에 직접 문의해주세요."
+                # 영어로 변경
+                "최대 운임 무게를 초과했습니다. 운영사에 직접 문의해주세요."
             )
         for rate_cost in rate_costs:
             if (
@@ -75,6 +78,10 @@ class BaseCostBuilder:
             self._freight_cost = self._min_load
         else:
             self._freight_cost = base_freight_cost
+        return self
+
+    def calculate_ftl_cost(self) -> "BaseCostBuilder":
+        self._freight_cost = self._max_load
         return self
 
     def calculate_with_fsc(self) -> "BaseCostBuilder":

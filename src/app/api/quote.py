@@ -100,7 +100,10 @@ async def create_quote(
     quote_service = QuoteService(uow)
 
     base_cost = await cost_service.calculate_base_cost(
-        request.cargo, request.from_location, request.to_location
+        cargo_transportation_id=request.cargo_transportation_id,
+        cargo_list=request.cargo,
+        from_location=request.from_location,
+        to_location=request.to_location,
     )
 
     if base_cost.is_max_load:
@@ -147,7 +150,10 @@ async def update_quote(
     quote_service = QuoteService(uow)
 
     base_cost = await cost_service.calculate_base_cost(
-        request.cargo, request.from_location, request.to_location
+        cargo_transportation_id=request.cargo_transportation_id,
+        cargo_list=request.cargo,
+        from_location=request.from_location,
+        to_location=request.to_location,
     )
 
     if base_cost.is_max_load:

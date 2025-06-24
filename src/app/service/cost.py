@@ -25,8 +25,10 @@ class CostService:
     ):
         self.uow = uow
 
+    # FTL 선택 시 즉시 max_load 값으로 계산되어야 함
     async def calculate_base_cost(
         self,
+        cargo_transportation_id: int,
         cargo_list: List[QuoteCargoSchema],
         from_location: QuoteLocationSchema,
         to_location: QuoteLocationSchema,
@@ -53,21 +55,38 @@ class CostService:
                 if from_location_area.id >= to_location_area.id
                 else to_location_area
             )
-            base_area_id = base_area.id
-
-            area_costs = await self.uow.rate_area_cost.get_area_costs(base_area_id)
-            
             builder.set_location_rate(
                 min_load=base_area.min_load,
                 max_load=base_area.max_load,
                 max_load_weight=base_area.max_load_weight,
             )
+            base_area_id = base_area.id
+            area_costs = await self.uow.rate_area_cost.get_area_costs(
+                base_area_id
+            )
 
-            builder.set_price_per_weight(area_costs)
-            builder.calculate_base_cost()
+            if cargo_transportation_id == 2: # FTL
+                builder.calculate_ftl_cost()
+            else: # LTL
+                builder.set_price_per_weight(area_costs)
+                builder.calculate_base_cost()
+            
             builder.calculate_with_fsc()
+            
+            # 개별 화물에 대한 계산 결과를 가져옵니다.
+            cargo_cost_schema = builder.calculate()
+            
+            # 계산된 비용과 무게를 전체 합계에 누적합니다.
+            total_cost = cargo_cost_schema.cost
+            total_freight_weight = cargo_cost_schema.freight_weight
+            is_any_max_load = cargo_cost_schema.is_max_load
 
-        return builder.calculate()
+        # 합산된 결과로 최종 BaseCostSchema를 생성하여 반환합니다.
+        return BaseCostSchema(
+            cost=total_cost,
+            freight_weight=total_freight_weight,
+            is_max_load=is_any_max_load,
+        )
 
     async def calculate_location_type_cost(
         self,
